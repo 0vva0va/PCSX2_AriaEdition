@@ -100,6 +100,39 @@
 		 </property>
 		</widget>
 	  </item>
+      <item row="3" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="aaModeLayout">
+        <item>
+         <widget class="QLabel" name="aaModeLabel">
+          <property name="text">
+           <string>Anti-Aliasing Mode:</string>
+          </property>
+          <property name="buddy">
+           <cstring>aaMode</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="aaMode">
+          <item>
+           <property name="text">
+            <string>Disabled</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>FXAA</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>SMAA</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
    </item>
@@ -277,6 +310,7 @@
   <tabstop>casSharpness</tabstop>
   <tabstop>fxaa</tabstop>
   <tabstop>smaa</tabstop>
+  <tabstop>aaMode</tabstop>
   <tabstop>tvShader</tabstop>
   <tabstop>shadeBoost</tabstop>
   <tabstop>shadeBoostBrightness</tabstop>
