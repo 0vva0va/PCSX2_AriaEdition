@@ -237,5 +237,6 @@
 		<file>images/Popn.svg</file>
 		<file>images/RyojouhenCon.svg</file>
 		<file>images/ShinkansenCon.svg</file>
+		<file>images/bg_image_dither.png</file>
 	</qresource>
 </RCC>

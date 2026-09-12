@@ -130,12 +130,12 @@ private:
 
 	GameListRefreshThread* m_refresh_thread = nullptr;
 
-	QMovie* m_background_movie = nullptr;
+	// Background image handling
 	QPixmap m_background_pixmap;
+	QPixmap m_fixed_background_pixmap;
+	float   m_fixed_background_opacity_percent = 30.0f; 
+	QtUtils::ScalingMode m_fixed_background_scaling = QtUtils::ScalingMode::Fill;
 	QColor m_background_text_color;
-	QtUtils::ScalingMode m_background_scaling = QtUtils::ScalingMode::Fit;
-	float m_background_opacity = 100.0f;
-	int m_background_last_frame = -1;
-	QSize m_background_last_size;
-	qreal m_background_last_dpr = 0.0;
+	float  m_background_opacity = 100.0f;
+	QSize  m_background_last_size;
 };

@@ -231,6 +231,10 @@ namespace
 GameListWidget::GameListWidget(QWidget* parent /* = nullptr */)
 	: QWidget(parent)
 {
+	// Load any configured custom background early so the widget has it available immediately.
+	// This mirrors behavior done later in initialize() for dynamic changes.
+	// Load the built-in fixed background (covers only the game list area)
+	m_fixed_background_pixmap = QPixmap(QStringLiteral(":/images/bg_image_dither.png"));
 }
 
 GameListWidget::~GameListWidget() = default;
@@ -385,117 +389,79 @@ void GameListWidget::initialize()
 
 void GameListWidget::setCustomBackground()
 {
-	// Cleanup old animation if it still exists on gamelist
-	if (m_background_movie != nullptr)
-	{
-		m_background_movie->disconnect(this);
-		delete m_background_movie;
-		m_background_movie = nullptr;
-	}
-
-	// Get the path to the custom background
 	std::string path = Host::GetBaseStringSettingValue("UI", "GameListBackgroundPath");
 	if (!Path::IsAbsolute(path))
 		path = Path::Combine(EmuFolders::DataRoot, path);
 
-	// Only try to create background if path are valid
+	// Invalidate any previous frame/size cache
+	m_background_last_size = QSize();
+
 	if (!path.empty() && FileSystem::FileExists(path.c_str()))
 	{
-		QString img_path = QString::fromStdString(path);
-		const QByteArray format = (img_path.endsWith(".png", Qt::CaseInsensitive)) ? QByteArray("apng") : QByteArray();
-		m_background_movie = new QMovie(img_path, format, this);
-		if (!m_background_movie->isValid())
+		QPixmap px(QString::fromStdString(path));
+		if (px.isNull())
 		{
-			Console.Warning("Failed to load background movie from: %s", path.c_str());
-			delete m_background_movie;
-			m_background_movie = nullptr;
+			Console.Warning("Failed to load background image from: %s", path.c_str());
+			m_background_pixmap = QPixmap();
+		}
+		else
+		{
+			m_background_pixmap = std::move(px);
 		}
 	}
 
-	// Invalidate frame cache so the next animated frame triggers full reprocessing
-	m_background_last_size = QSize();
-
-	// If there is no valid background then reset fallback to default UI state
-	if (!m_background_movie)
+	if (m_background_pixmap.isNull())
 	{
-		m_background_pixmap = QPixmap();
-		m_ui.stack->setAutoFillBackground(true);
-		m_table_view->viewport()->setAutoFillBackground(true);
-		m_list_view->viewport()->setAutoFillBackground(true);
+		// If no fixed baked-in background is available, fall back to the old behavior.
+		if (m_fixed_background_pixmap.isNull())
+		{
+			m_ui.stack->setAutoFillBackground(true);
+			m_table_view->viewport()->setAutoFillBackground(true);
+			m_list_view->viewport()->setAutoFillBackground(true);
 
-		m_ui.stack->setPalette(QPalette());
-		m_background_text_color = QColor();
-		m_empty_widget->setPalette(QPalette());
-		m_empty_widget->setAutoFillBackground(false);
+			m_ui.stack->setPalette(QPalette());
+			m_background_text_color = QColor();
+			m_empty_widget->setPalette(QPalette());
+			m_empty_widget->setAutoFillBackground(false);
 
+			m_ui.stack->update();
+			m_table_view->setAlternatingRowColors(true);
+			return;
+		}
+
+		// We have a fixed baked-in background; ensure child viewports are transparent
+		m_ui.stack->setAutoFillBackground(false);
+		m_table_view->viewport()->setAutoFillBackground(false);
+		m_list_view->viewport()->setAutoFillBackground(false);
+
+		// Apply UI updates for the fixed background case.
 		m_ui.stack->update();
-		m_table_view->setAlternatingRowColors(true);
+		m_table_view->setAlternatingRowColors(false);
 		return;
 	}
 
-	// Cache all frames for small images so loops don't keep re-decoding
-	if (const s64 file_size = FileSystem::GetPathFileSize(path.c_str()); file_size > 0 && file_size < 25 * 1024 * 1024)
-		m_background_movie->setCacheMode(QMovie::CacheAll);
-
-	// Retrieve scaling setting
-	m_background_scaling = QtUtils::ScalingMode::Fit;
-	const std::string ar_value = Host::GetBaseStringSettingValue("UI", "GameListBackgroundMode", InterfaceSettingsWidget::BACKGROUND_SCALE_NAMES[static_cast<u8>(QtUtils::ScalingMode::Fit)]);
-	for (u8 i = 0; i < static_cast<u8>(QtUtils::ScalingMode::MaxCount); i++)
-	{
-		if (InterfaceSettingsWidget::BACKGROUND_SCALE_NAMES[i] != nullptr)
-		{
-			if (ar_value == InterfaceSettingsWidget::BACKGROUND_SCALE_NAMES[i])
-			{
-				m_background_scaling = static_cast<QtUtils::ScalingMode>(i);
-				break;
-			}
-		}
-	}
-
-	// Retrieve opacity setting
-	m_background_opacity = Host::GetBaseFloatSettingValue("UI", "GameListBackgroundOpacity", 100.0f);
-
-	// Selected Custom background is valid, connect the signals and start animation in gamelist
-	connect(m_background_movie, &QMovie::frameChanged, this, &GameListWidget::processBackgroundFrames);
+	// We have a valid static pixmap. Ensure widgets don't auto-fill so background is visible
 	m_ui.stack->setAutoFillBackground(false);
-
 	m_table_view->viewport()->setAutoFillBackground(false);
 	m_list_view->viewport()->setAutoFillBackground(false);
-	m_background_movie->start();
-	updateCustomBackgroundState();
+
+	// Apply any UI state updates needed and request a repaint
 	m_table_view->setAlternatingRowColors(false);
-	processBackgroundFrames();
+	m_ui.stack->update();
 }
 
 void GameListWidget::updateCustomBackgroundState()
 {
-	if (m_background_movie && m_background_movie->isValid())
-		m_background_movie->setPaused(!(isVisible() && qGuiApp->applicationState() == Qt::ApplicationActive));
+	// No-op for static QPixmap backgrounds. Previously this handled pausing/resuming
+	// animated movie backgrounds; those were removed in favor of static images.
 }
 
 void GameListWidget::processBackgroundFrames()
 {
-	if (!m_background_movie || !m_background_movie->isValid() || !isVisible())
+	if (m_background_pixmap.isNull())
 		return;
 
-	const QSize widget_size(m_ui.stack->width(), m_ui.stack->height());
-	if (widget_size.isEmpty())
-		return;
-
-	const int frame_number = m_background_movie->currentFrameNumber();
-	const qreal dpr = devicePixelRatioF();
-
-	if (frame_number == m_background_last_frame && widget_size == m_background_last_size && qFuzzyCompare(dpr, m_background_last_dpr))
-		return;
-
-	QPixmap pm = m_background_movie->currentPixmap();
-	updateBackgroundTextColor(pm);
-	QtUtils::resizeAndScalePixmap(&pm, widget_size.width(), widget_size.height(), dpr, m_background_scaling, m_background_opacity);
-
-	m_background_pixmap = std::move(pm);
-	m_background_last_frame = frame_number;
-	m_background_last_size = widget_size;
-	m_background_last_dpr = dpr;
+	updateBackgroundTextColor(m_background_pixmap);
 	m_ui.stack->update();
 }
 
@@ -867,13 +833,32 @@ bool GameListWidget::eventFilter(QObject* watched, QEvent* event)
 {
 	if (watched == m_ui.stack && event->type() == QEvent::Paint)
 	{
+		QPainter painter(m_ui.stack);
+		painter.setClipRect(static_cast<QPaintEvent*>(event)->rect());
+
+		const QSize widget_size(m_ui.stack->width(), m_ui.stack->height());
+		const qreal dpr = m_ui.stack->devicePixelRatioF();
+
+		bool drew = false;
+
+		// Draw the fixed built-in background (under the custom/animated background)
+		if (!m_fixed_background_pixmap.isNull() && !widget_size.isEmpty())
+		{
+			QPixmap pm = m_fixed_background_pixmap;
+			QtUtils::resizeAndScalePixmap(&pm, widget_size.width(), widget_size.height(), dpr, m_fixed_background_scaling, m_fixed_background_opacity_percent);
+			painter.drawPixmap(0, 0, pm);
+			drew = true;
+		}
+
+		// Draw animated/custom background on top if present
 		if (!m_background_pixmap.isNull())
 		{
-			QPainter painter(m_ui.stack);
-			painter.setClipRect(static_cast<QPaintEvent*>(event)->rect());
 			painter.drawPixmap(0, 0, m_background_pixmap);
-			return true;
+			drew = true;
 		}
+
+		if (drew)
+			return true;
 	}
 
 	return QWidget::eventFilter(watched, event);
