@@ -1047,9 +1047,27 @@ void GSDevice::ShadeBoost()
 			static_cast<float>(GSConfig.ShadeBoost_Brightness) * (1.0f / 50.0f),
 			static_cast<float>(GSConfig.ShadeBoost_Contrast) * (1.0f / 50.0f),
 			static_cast<float>(GSConfig.ShadeBoost_Saturation) * (1.0f / 50.0f),
-			static_cast<float>(GSConfig.ShadeBoost_Gamma) * (1.0f / 50.0f));
+			static_cast<float>(GSConfig.ShadeBoost_Gamma) * (1.0f / 50.0f)
+		);
 
 		DoShadeBoost(m_current, m_target_tmp, params.v);
+
+		m_current = m_target_tmp;
+	}
+}
+
+void GSDevice::LumaSharpen()
+{
+	if (ResizeRenderTarget(&m_target_tmp, m_current->GetWidth(), m_current->GetHeight(), false, false))
+	{
+		const GSVector4 params(
+			static_cast<float>(GSConfig.LumaSharpen_SharpStrength),
+			static_cast<float>(GSConfig.LumaSharpen_SharpClamp),
+			static_cast<float>(GSConfig.LumaSharpen_Pattern),
+			static_cast<float>(GSConfig.LumaSharpen_Offset)
+		);
+
+		DoLumaSharpen(m_current, m_target_tmp, params.v);
 
 		m_current = m_target_tmp;
 	}

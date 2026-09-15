@@ -751,6 +751,11 @@ struct Pcsx2Config
 		static constexpr int DEFAULT_SHADEBOOST_GAMMA = 50;
 		static constexpr int DEFAULT_SHADEBOOST_SATURATION = 50;
 
+		static constexpr float DEFAULT_LUMASHARPEN_SHARPSTRENGTH = 0.65f;
+		static constexpr float DEFAULT_LUMASHARPEN_SHARPCLAMP = 0.035f;
+		static constexpr float DEFAULT_LUMASHARPEN_PATTERN = 1.0f;
+		static constexpr float DEFAULT_LUMASHARPEN_OFFSET = 1.0f;
+
 		union
 		{
 			u64 bitsets[2];
@@ -823,6 +828,7 @@ struct Pcsx2Config
 					FXAA : 1,
 					SMAA : 1,
 					ShadeBoost : 1,
+					LumaSharpen : 1,
 					DumpGSData : 1,
 					SaveRT : 1,
 					SaveFrame : 1,
@@ -912,6 +918,12 @@ struct Pcsx2Config
 		u8 ShadeBoost_Contrast = DEFAULT_SHADEBOOST_CONTRAST;
 		u8 ShadeBoost_Saturation = DEFAULT_SHADEBOOST_SATURATION;
 		u8 ShadeBoost_Gamma = DEFAULT_SHADEBOOST_GAMMA;
+
+		float LumaSharpen_SharpStrength = DEFAULT_LUMASHARPEN_SHARPSTRENGTH;
+		float LumaSharpen_SharpClamp = DEFAULT_LUMASHARPEN_SHARPCLAMP;
+		float LumaSharpen_Pattern = DEFAULT_LUMASHARPEN_PATTERN;
+		float LumaSharpen_Offset = DEFAULT_LUMASHARPEN_OFFSET;
+
 		u8 PNGCompressionLevel = 1;
 
 		u16 SWExtraThreads = 2;

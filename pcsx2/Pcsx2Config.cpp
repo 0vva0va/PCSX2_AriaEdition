@@ -869,6 +869,10 @@ bool Pcsx2Config::GSOptions::OptionsAreEqual(const GSOptions& right) const
 		OpEqu(ShadeBoost_Contrast) &&
 		OpEqu(ShadeBoost_Saturation) &&
 		OpEqu(ShadeBoost_Gamma) &&
+		OpEqu(LumaSharpen_SharpStrength) &&
+		OpEqu(LumaSharpen_SharpClamp) &&
+		OpEqu(LumaSharpen_Pattern) &&
+		OpEqu(LumaSharpen_Offset) &&
 		OpEqu(PNGCompressionLevel) &&
 		OpEqu(SaveDrawStart) &&
 		OpEqu(SaveDrawCount) &&
@@ -1010,6 +1014,7 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapBitBoolEx(FXAA, "fxaa");
 	SettingsWrapBitBoolEx(SMAA, "smaa");
 	SettingsWrapBitBool(ShadeBoost);
+	SettingsWrapBitBool(LumaSharpen);
 	SettingsWrapBitBoolEx(DumpGSData, "DumpGSData");
 	SettingsWrapBitBoolEx(SaveRT, "SaveRT");
 	SettingsWrapBitBoolEx(SaveFrame, "SaveFrame");
@@ -1088,6 +1093,10 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapBitfield(ShadeBoost_Contrast);
 	SettingsWrapBitfield(ShadeBoost_Saturation);
 	SettingsWrapBitfield(ShadeBoost_Gamma);
+	SettingsWrapBitfield(LumaSharpen_SharpStrength);
+	SettingsWrapBitfield(LumaSharpen_SharpClamp);
+	SettingsWrapBitfield(LumaSharpen_Pattern);
+	SettingsWrapBitfield(LumaSharpen_Offset);
 	SettingsWrapBitfield(ExclusiveFullscreenControl);
 	SettingsWrapBitfieldEx(PNGCompressionLevel, "png_compression_level");
 	SettingsWrapBitfieldEx(SaveDrawStart, "SaveDrawStart");

@@ -77,11 +77,13 @@
     <None Include="..\bin\resources\shaders\vulkan\merge.glsl" />
     <None Include="..\bin\resources\shaders\vulkan\present.glsl" />
     <None Include="..\bin\resources\shaders\vulkan\shadeboost.glsl" />
+    <None Include="..\bin\resources\shaders\vulkan\lumasharpen.glsl" />
     <None Include="..\bin\resources\shaders\vulkan\tfx.glsl" />
     <None Include="..\bin\resources\shaders\opengl\convert.glsl" />
     <None Include="..\bin\resources\shaders\opengl\interlace.glsl" />
     <None Include="..\bin\resources\shaders\opengl\merge.glsl" />
     <None Include="..\bin\resources\shaders\opengl\shadeboost.glsl" />
+    <None Include="..\bin\resources\shaders\opengl\lumasharpen.glsl" />
     <None Include="..\bin\resources\shaders\opengl\tfx_fs.glsl" />
     <None Include="..\bin\resources\shaders\opengl\tfx_vgs.glsl" />
     <None Include="..\bin\resources\shaders\dx11\convert.fx" />
@@ -89,6 +91,7 @@
     <None Include="..\bin\resources\shaders\dx11\interlace.fx" />
     <None Include="..\bin\resources\shaders\dx11\merge.fx" />
     <None Include="..\bin\resources\shaders\dx11\shadeboost.fx" />
+    <None Include="..\bin\resources\shaders\dx11\lumasharpen.fx" />
     <None Include="..\bin\resources\shaders\dx11\tfx.fx" />
     <None Include="..\bin\resources\shaders\dx11\imgui.fx" />
     <None Include="..\bin\resources\shaders\dx11\present.fx" />

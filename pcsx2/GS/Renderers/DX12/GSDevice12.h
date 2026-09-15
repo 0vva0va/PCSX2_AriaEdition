@@ -413,6 +413,7 @@ private:
 	ComPtr<ID3D12PipelineState> m_fxaa_pipeline;
 	ComPtr<ID3D12PipelineState> m_smaa_pipeline;
 	ComPtr<ID3D12PipelineState> m_shadeboost_pipeline;
+	ComPtr<ID3D12PipelineState> m_lumasharpen_pipeline;
 	ComPtr<ID3D12PipelineState> m_imgui_pipeline;
 
 	ID3D12PipelineState* GetConvertPipeline(ShaderConvertSelector shader) const
@@ -458,6 +459,7 @@ private:
 	void DoInterlace(GSTexture* sTex, const GSVector4& sRect, GSTexture* dTex, const GSVector4& dRect,
 		ShaderInterlace shader, Filter filter, const InterlaceConstantBuffer& cb) final;
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
+	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
 	void DoSMAA(GSTexture* sTex, GSTexture* dTex) final;
 

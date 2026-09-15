@@ -211,11 +211,19 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	//////////////////////////////////////////////////////////////////////////
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.fxaa, "EmuCore/GS", "fxaa", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.smaa, "EmuCore/GS", "smaa", false);
+
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.shadeBoost, "EmuCore/GS", "ShadeBoost", false);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostBrightness, "EmuCore/GS", "ShadeBoost_Brightness", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_BRIGHTNESS);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostContrast, "EmuCore/GS", "ShadeBoost_Contrast", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_CONTRAST);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostGamma, "EmuCore/GS", "ShadeBoost_Gamma", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_GAMMA);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostSaturation, "EmuCore/GS", "ShadeBoost_Saturation", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_SATURATION);
+
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.lumaSharpen, "EmuCore/GS", "LumaSharpen", false);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenSharpness, "EmuCore/GS", "LumaSharpen_SharpStrength", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_SHARPSTRENGTH);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenClamp, "EmuCore/GS", "LumaSharpen_SharpClamp", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_SHARPCLAMP);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenPattern, "EmuCore/GS", "LumaSharpen_Pattern", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_PATTERN);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenOffset, "EmuCore/GS", "LumaSharpen_Offset", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_OFFSET);
+
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.tvShader, "EmuCore/GS", "TVShader", DEFAULT_TV_SHADER_MODE);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.casMode, "EmuCore/GS", "CASMode", static_cast<int>(Pcsx2Config::GSOptions::DEFAULT_CAS_MODE));
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.aaMode, "EmuCore/GS", "AAMode", static_cast<int>(Pcsx2Config::GSOptions::DEFAULT_AA_MODE));
@@ -223,6 +231,9 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 
 	connect(m_post.shadeBoost, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onShadeBoostChanged);
 	onShadeBoostChanged();
+
+	connect(m_post.lumaSharpen, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onLumaSharpenChanged);
+	onLumaSharpenChanged();
 
 	//////////////////////////////////////////////////////////////////////////
 	// Advanced Settings
@@ -714,24 +725,23 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 
 		dialog()->registerWidgetHelp(m_post.casSharpness, tr("Sharpness"), tr("50%"), tr("Determines the intensity the sharpening effect in CAS post-processing."));
 
-		dialog()->registerWidgetHelp(m_post.shadeBoost, tr("Shade Boost"), tr("Unchecked"),
-			tr("Enables saturation, contrast, and brightness to be adjusted. Values of brightness, saturation, and contrast are at default "
-			   "50."));
+		dialog()->registerWidgetHelp(m_post.shadeBoost, tr("Shade Boost"), tr("Unchecked"), tr("Enables saturation, contrast, and brightness to be adjusted. Values of brightness, saturation, and contrast are at default ""50."));
 
 		dialog()->registerWidgetHelp(m_post.fxaa, tr("FXAA"), tr("Unchecked"), tr("Applies the FXAA anti-aliasing algorithm to improve the visual quality of games."));
-
 		dialog()->registerWidgetHelp(m_post.smaa, tr("SMAA"), tr("Unchecked"), tr("Applies the SMAA anti-aliasing algorithm to improve the visual quality of games."));
 
 		dialog()->registerWidgetHelp(m_post.shadeBoostBrightness, tr("Brightness"), tr("50"), tr("Adjusts brightness. 50 is normal."));
-
 		dialog()->registerWidgetHelp(m_post.shadeBoostContrast, tr("Contrast"), tr("50"), tr("Adjusts contrast. 50 is normal."));
-
 		dialog()->registerWidgetHelp(m_post.shadeBoostGamma, tr("Gamma"), tr("50"), tr("Adjusts gamma. 50 is normal."));
-
 		dialog()->registerWidgetHelp(m_post.shadeBoostSaturation, tr("Saturation"), tr("50"), tr("Adjusts saturation. 50 is normal."));
 
-		dialog()->registerWidgetHelp(m_post.tvShader, tr("TV Shader"), tr("None (Default)"),
-			tr("Applies a shader which replicates the visual effects of different styles of television sets."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpen, tr("Luma Sharpen"), tr("Unchecked"), tr("Applies the Luma Sharpening algorithm to improve the visual quality of games."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenSharpness, tr("Sharpness"), tr("1.0"), tr("Adjusts the sharpness of the Luma Sharpening effect."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenClamp, tr("Clamp"), tr("0.1"), tr("Adjusts the clamp value for the Luma Sharpening effect."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenPattern, tr("Pattern"), tr("0"), tr("Selects the pattern for the Luma Sharpening effect."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenOffset, tr("Offset"), tr("0"), tr("Adjusts the offset for the Luma Sharpening effect."));
+
+		dialog()->registerWidgetHelp(m_post.tvShader, tr("TV Shader"), tr("None (Default)"), tr("Applies a shader which replicates the visual effects of different styles of television sets."));
 	}
 
 	// Recording tab
@@ -922,6 +932,16 @@ void GraphicsSettingsWidget::onShadeBoostChanged()
 	m_post.shadeBoostContrast->setEnabled(enabled);
 	m_post.shadeBoostGamma->setEnabled(enabled);
 	m_post.shadeBoostSaturation->setEnabled(enabled);
+}
+
+void GraphicsSettingsWidget::onLumaSharpenChanged()
+{
+	const bool enabled = dialog()->getEffectiveBoolValue("EmuCore/GS", "LumaSharpen", false);
+	m_post.lumaSharpenSharpness->setEnabled(enabled);
+	m_post.lumaSharpenClamp->setEnabled(enabled);
+	m_post.lumaSharpenPattern->setEnabled(enabled);
+	m_post.lumaSharpenOffset->setEnabled(enabled);
+	g_emu_thread->applySettings();
 }
 
 void GraphicsSettingsWidget::onTextureDumpChanged()

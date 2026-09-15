@@ -100,7 +100,133 @@
 		 </property>
 		</widget>
 	  </item>
-      <item row="3" column="0" colspan="2">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="lumaSharpen">
+        <property name="text">
+         <string>Luma Sharpen</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="lumaSharpenLayout" stretch="1,0">
+        <item>
+         <widget class="QLabel" name="lumaSharpnessLabel">
+          <property name="text">
+           <string>Sharpness:</string>
+          </property>
+          <property name="buddy">
+           <cstring>sharp_strenght</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="lumaSharpenSharpness">
+          <property name="minimum">
+           <double>0.10000000000000001</double>
+          </property>
+          <property name="maximum">
+           <double>3.0</double>
+          </property>
+          <property name="singleStep">
+           <double>0.10000000000000001</double>
+          </property>
+          <property name="decimals">
+           <number>2</number>
+          </property>
+          <property name="value">
+           <double>1.0</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lumaSharpenClampLabel">
+          <property name="text">
+           <string>Clamp:</string>
+          </property>
+          <property name="buddy">
+           <cstring>sharp_clamp</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDoubleSpinBox" name="lumaSharpenClamp">
+          <property name="minimum">
+           <double>0.0</double>
+          </property>
+          <property name="maximum">
+           <double>1.0</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000000</double>
+          </property>
+          <property name="decimals">
+           <number>2</number>
+          </property>
+          <property name="value">
+           <double>0.10000000000000001</double>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="patternLabel">
+          <property name="text">
+           <string>Pattern:</string>
+          </property>
+          <property name="buddy">
+           <cstring>pattern</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="lumaSharpenPattern">
+          <item>
+           <property name="text">
+            <string>0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>2</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>3</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="offsetBiasLabel">
+          <property name="text">
+           <string>Offset Bias:</string>
+          </property>
+          <property name="buddy">
+           <cstring>offset_bias</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="lumaSharpenOffset">
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>6</number>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0" colspan="2">
        <layout class="QHBoxLayout" name="aaModeLayout">
         <item>
          <widget class="QLabel" name="aaModeLabel">
@@ -310,6 +436,11 @@
   <tabstop>casSharpness</tabstop>
   <tabstop>fxaa</tabstop>
   <tabstop>smaa</tabstop>
+  <tabstop>lumaSharpen</tabstop>
+  <tabstop>sharp_strenght</tabstop>
+  <tabstop>sharp_clamp</tabstop>
+  <tabstop>pattern</tabstop>
+  <tabstop>offset_bias</tabstop>
   <tabstop>aaMode</tabstop>
   <tabstop>tvShader</tabstop>
   <tabstop>shadeBoost</tabstop>

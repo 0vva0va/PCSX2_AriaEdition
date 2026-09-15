@@ -576,7 +576,8 @@ bool GSDeviceOGL::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 	// ****************************************************************
 	// Post processing
 	// ****************************************************************
-	if (!CompileShadeBoostProgram() || !CompileFXAAProgram())
+	// Compile post-processing shaders that may be used later (ensure uniforms are registered)
+	if (!CompileShadeBoostProgram() || !CompileFXAAProgram() || !CompileLumaSharpenProgram())
 		return false;
 
 	// Image load store and GLSL 420pack is core in GL4.2, no need to check.
@@ -2296,6 +2297,40 @@ void GSDeviceOGL::DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float par
 	const GSVector4 dRect(0, 0, s.x, s.y);
 
 	DoStretchRect(sTex, sRect, dTex, dRect, m_shadeboost.ps, Nearest);
+}
+
+bool GSDeviceOGL::CompileLumaSharpenProgram()
+{
+	const std::optional<std::string> shader = ReadShaderSource("shaders/opengl/lumasharpen.glsl");
+	if (!shader.has_value())
+	{
+		Host::ReportErrorAsync("GS", "Failed to read shaders/opengl/lumasharpen.glsl");
+		return false;
+	}
+
+	const std::string ps(GetShaderSource("ps_main", GL_FRAGMENT_SHADER, *shader));
+	if (!m_shader_cache.GetProgram(&m_lumasharpen.ps, m_convert.vs, ps))
+		return false;
+	m_lumasharpen.ps.RegisterUniform("params");
+	m_lumasharpen.ps.SetName("LumaSharpen pipe");
+	return true;
+}
+
+void GSDeviceOGL::DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	GL_PUSH("DoLumaSharpen");
+
+	m_lumasharpen.ps.Bind();
+	m_lumasharpen.ps.Uniform4fv(0, params);
+
+	OMSetColorMaskState();
+
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_lumasharpen.ps, Nearest);
 }
 
 void GSDeviceOGL::SetupDATE(GSTexture* rt, GSTexture* ds, SetDATM datm, const GSVector4i& bbox)

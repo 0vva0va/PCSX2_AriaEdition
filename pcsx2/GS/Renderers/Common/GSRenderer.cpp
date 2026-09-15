@@ -246,6 +246,9 @@ bool GSRenderer::Merge(int field)
 	if (GSConfig.ShadeBoost)
 		g_gs_device->ShadeBoost();
 
+	if (GSConfig.LumaSharpen)
+		g_gs_device->LumaSharpen();
+
 	if (GSConfig.FXAA)
 		g_gs_device->FXAA();
 
