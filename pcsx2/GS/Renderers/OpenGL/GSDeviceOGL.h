@@ -240,6 +240,11 @@ private:
 
 	struct
 	{
+		GLProgram ps;
+	} m_fakehdr;
+
+	struct
+	{
 		GLProgram upscale_ps;
 		GLProgram sharpen_ps;
 	} m_cas;
@@ -312,6 +317,9 @@ private:
 
 	bool CompileLumaSharpenProgram();
 	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
+
+	bool CompileFakeHDRProgram();
+	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 
 	bool CreateCASPrograms();
 	bool DoCAS(GSTexture* sTex, GSTexture* dTex, bool sharpen_only, const std::array<u32, NUM_CAS_CONSTANTS>& constants) override;

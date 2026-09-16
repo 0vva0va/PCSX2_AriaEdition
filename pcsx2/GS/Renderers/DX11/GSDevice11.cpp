@@ -393,6 +393,21 @@ bool GSDevice11::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 	if (!m_lumasharpen.ps)
 		return false;
 
+	// Fake HDR
+	memset(&bd, 0, sizeof(bd));
+	bd.ByteWidth = sizeof(float) * 4;
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	m_dev->CreateBuffer(&bd, nullptr, m_fakehdr.cb.put());
+
+	shader = ReadShaderSource("shaders/dx11/fakehdr.fx");
+	if (!shader.has_value())
+		return false;
+	m_fakehdr.ps = m_shader_cache.GetPixelShader(m_dev.get(), *shader, nullptr, "ps_main");
+	if (!m_fakehdr.ps)
+		return false;
+
 
 	// Vertex/Index Buffer
 	bd = {};
@@ -645,6 +660,7 @@ void GSDevice11::Destroy()
 	m_interlace = {};
 	m_shadeboost = {};
 	m_lumasharpen = {};
+	m_fakehdr = {};
 	m_date = {};
 	m_cas = {};
 	m_imgui = {};
@@ -2036,6 +2052,18 @@ void GSDevice11::DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float par
 	UpdateSubresource(m_lumasharpen.cb.get(), params, &m_lumasharpen.cb_uniforms, sizeof(float) * 4);
 
 	DoStretchRect(sTex, sRect, dTex, dRect, m_lumasharpen.ps.get(), m_lumasharpen.cb.get(), Nearest);
+}
+
+void GSDevice11::DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	UpdateSubresource(m_fakehdr.cb.get(), params, &m_fakehdr.cb_uniforms, sizeof(float) * 4);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_fakehdr.ps.get(), m_fakehdr.cb.get(), Nearest);
 }
 
 void GSDevice11::SetupVS(VSSelector sel, const GSHWDrawConfig::VSConstantBuffer* cb)

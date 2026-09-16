@@ -1073,6 +1073,24 @@ void GSDevice::LumaSharpen()
 	}
 }
 
+void GSDevice::FakeHDR()
+{
+	if (ResizeRenderTarget(&m_target_tmp, m_current->GetWidth(), m_current->GetHeight(), false, false))
+	{
+
+		// Use FakeHDR-specific settings (was incorrectly using ShadeBoost settings)
+		const GSVector4 params(
+			static_cast<float>(GSConfig.FakeHDR_HDRStrength),
+			static_cast<float>(GSConfig.FakeHDR_Radius1),
+			static_cast<float>(GSConfig.FakeHDR_Radius2),
+			static_cast<float>(1.0f));
+
+		DoFakeHDR(m_current, m_target_tmp, params.v);
+
+		m_current = m_target_tmp;
+	}
+}
+
 void GSDevice::Resize(int width, int height)
 {
 	GSTexture*& dTex = (m_current == m_target_tmp) ? m_merge : m_target_tmp;

@@ -1510,6 +1510,7 @@ protected:
 	virtual void DoSMAA(GSTexture* sTex, GSTexture* dTex) = 0;
 	virtual void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
 	virtual void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
+	virtual void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
 
 	/// Resolves CAS shader includes for the specified source.
 	static bool GetCASShaderSource(std::string* source);
@@ -1722,6 +1723,7 @@ public:
 	void SMAA();
 	void ShadeBoost();
 	void LumaSharpen();
+	void FakeHDR();
 	void Resize(int width, int height);
 
 	void CAS(GSTexture*& tex, GSVector4i& src_rect, GSVector4& src_uv, const GSVector4& draw_rect, bool sharpen_only);

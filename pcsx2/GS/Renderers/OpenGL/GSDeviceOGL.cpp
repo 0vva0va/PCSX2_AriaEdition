@@ -577,7 +577,10 @@ bool GSDeviceOGL::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 	// Post processing
 	// ****************************************************************
 	// Compile post-processing shaders that may be used later (ensure uniforms are registered)
-	if (!CompileShadeBoostProgram() || !CompileFXAAProgram() || !CompileLumaSharpenProgram())
+	if (!CompileShadeBoostProgram()  || 
+	    !CompileFXAAProgram()        || 
+		!CompileLumaSharpenProgram() ||
+		!CompileFakeHDRProgram())
 		return false;
 
 	// Image load store and GLSL 420pack is core in GL4.2, no need to check.
@@ -966,12 +969,16 @@ void GSDeviceOGL::DestroyResources()
 	m_cas.sharpen_ps.Destroy();
 
 	m_shadeboost.ps.Destroy();
+	m_lumasharpen.ps.Destroy();
 
 	for (GLProgram& prog : m_date.primid_ps)
 		prog.Destroy();
 	delete m_date.dss;
 
 	m_fxaa.ps.Destroy();
+	m_smaa.ps.Destroy();
+	m_fakehdr.ps.Destroy();
+
 
 	for (GLProgram& prog : m_present)
 		prog.Destroy();
@@ -2231,6 +2238,23 @@ bool GSDeviceOGL::CompileSMAAProgram()
 	return true;
 }
 
+bool GSDeviceOGL::CompileFakeHDRProgram()
+{
+	const std::optional<std::string> shader = ReadShaderSource("shaders/opengl/fakehdr.glsl");
+	if (!shader.has_value())
+	{
+		Host::ReportErrorAsync("GS", "Failed to read shaders/opengl/fakehdr.glsl.");
+		return false;
+	}
+
+	const std::string ps(GetShaderSource("ps_main", GL_FRAGMENT_SHADER, *shader));
+	if (!m_shader_cache.GetProgram(&m_fakehdr.ps, m_convert.vs, ps))
+		return false;
+	m_fakehdr.ps.RegisterUniform("params");
+	m_fakehdr.ps.SetName("FakeHDR pipe");
+	return true;
+}
+
 void GSDeviceOGL::DoFXAA(GSTexture* sTex, GSTexture* dTex)
 {
 	if (!m_fxaa.ps.IsValid())
@@ -2263,6 +2287,23 @@ void GSDeviceOGL::DoSMAA(GSTexture* sTex, GSTexture* dTex)
 	const GSVector4 dRect(0, 0, s.x, s.y);
 
 	DoStretchRect(sTex, sRect, dTex, dRect, m_smaa.ps, Biln);
+}
+
+void GSDeviceOGL::DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	GL_PUSH("DoFakeHDR");
+
+	m_fakehdr.ps.Bind();
+	m_fakehdr.ps.Uniform4fv(0, params);
+
+	OMSetColorMaskState();
+
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_fakehdr.ps, Nearest);
 }
 
 bool GSDeviceOGL::CompileShadeBoostProgram()

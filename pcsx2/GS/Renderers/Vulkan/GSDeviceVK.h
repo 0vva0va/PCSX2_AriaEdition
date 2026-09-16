@@ -448,6 +448,7 @@ private:
 	VkPipeline m_smaa_pipeline = {};
 	VkPipeline m_shadeboost_pipeline = {};
 	VkPipeline m_lumasharpen_pipeline = {};
+	VkPipeline m_fakehdr_pipeline = {};
 
 	VkPipeline GetConvertPipeline(ShaderConvertSelector shader) const
 	{
@@ -494,6 +495,7 @@ private:
 		ShaderInterlace shader, Filter filter, const InterlaceConstantBuffer& cb) final;
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
+	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
 	void DoSMAA(GSTexture* sTex, GSTexture* dTex) final;
 

@@ -3555,6 +3555,23 @@ void GSDeviceVK::DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float par
 	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
 }
 
+void GSDeviceVK::DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
+	const GSVector4i dRect = dTex->GetRect();
+	EndRenderPass();
+	OMSetRenderTargets(dTex, nullptr, dRect);
+	SetUtilityTexture(sTex, m_point_sampler);
+	BeginRenderPass(m_utility_color_render_pass_discard, dRect);
+	dTex->SetState(GSTexture::State::Dirty);
+	SetPipeline(m_fakehdr_pipeline);
+	SetUtilityPushConstants(params, sizeof(float) * 4);
+	DrawStretchRect(sRect, GSVector4(dRect), dTex->GetSize());
+	EndRenderPass();
+
+	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
+}
+
 void GSDeviceVK::DoFXAA(GSTexture* sTex, GSTexture* dTex)
 {
 	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
@@ -4612,6 +4629,34 @@ bool GSDeviceVK::CompilePostProcessingPipelines()
 		Vulkan::SetObjectName(m_device, m_lumasharpen_pipeline, "LumaSharpen pipeline");
 	}
 
+	{
+		const std::optional<std::string> shader = ReadShaderSource("shaders/vulkan/fakehdr.glsl");
+		if (!shader)
+		{
+			Host::ReportErrorAsync("GS", "Failed to read shaders/vulkan/fakehdr.glsl.");
+			return false;
+		}
+
+		VkShaderModule vs = GetUtilityVertexShader(*shader);
+		ScopedGuard vs_guard([this, &vs]() { vkDestroyShaderModule(m_device, vs, nullptr); });
+		if (vs == VK_NULL_HANDLE)
+			return false;
+
+		VkShaderModule ps = GetUtilityFragmentShader(*shader);
+		ScopedGuard ps_guard([this, &ps]() { vkDestroyShaderModule(m_device, ps, nullptr); });
+		if (ps == VK_NULL_HANDLE)
+			return false;
+
+		gpb.SetVertexShader(vs);
+		gpb.SetFragmentShader(ps);
+
+		m_fakehdr_pipeline = gpb.Create(m_device, g_vulkan_shader_cache->GetPipelineCache(true), false);
+		if (!m_fakehdr_pipeline)
+			return false;
+
+		Vulkan::SetObjectName(m_device, m_fakehdr_pipeline, "FakeHDR pipeline");
+	}
+
 	return true;
 }
 
@@ -4904,6 +4949,8 @@ void GSDeviceVK::DestroyResources()
 		vkDestroyPipeline(m_device, m_shadeboost_pipeline, nullptr);
 	if (m_lumasharpen_pipeline != VK_NULL_HANDLE)
 		vkDestroyPipeline(m_device, m_lumasharpen_pipeline, nullptr);
+	if (m_fakehdr_pipeline != VK_NULL_HANDLE)
+		vkDestroyPipeline(m_device, m_fakehdr_pipeline, nullptr);
 
 	for (VkPipeline it : m_cas_pipelines)
 	{

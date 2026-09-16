@@ -756,6 +756,10 @@ struct Pcsx2Config
 		static constexpr float DEFAULT_LUMASHARPEN_PATTERN = 1.0f;
 		static constexpr float DEFAULT_LUMASHARPEN_OFFSET = 1.0f;
 
+		static constexpr float DEFAULT_FAKEHDR_HDRPOWER = 1.3f;
+		static constexpr float DEFAULT_FAKEHDR_RADIUS1 = 0.793f;
+		static constexpr float DEFAULT_FAKEHDR_RADIUS2 = 0.87f;
+
 		union
 		{
 			u64 bitsets[2];
@@ -827,6 +831,7 @@ struct Pcsx2Config
 					UserHacks_RewriteLargeSTCoords : 1,
 					FXAA : 1,
 					SMAA : 1,
+					FakeHDR : 1,
 					ShadeBoost : 1,
 					LumaSharpen : 1,
 					DumpGSData : 1,
@@ -923,6 +928,10 @@ struct Pcsx2Config
 		float LumaSharpen_SharpClamp = DEFAULT_LUMASHARPEN_SHARPCLAMP;
 		float LumaSharpen_Pattern = DEFAULT_LUMASHARPEN_PATTERN;
 		float LumaSharpen_Offset = DEFAULT_LUMASHARPEN_OFFSET;
+
+		float FakeHDR_HDRStrength = DEFAULT_FAKEHDR_HDRPOWER;
+		float FakeHDR_Radius1 = DEFAULT_FAKEHDR_RADIUS1;
+		float FakeHDR_Radius2 = DEFAULT_FAKEHDR_RADIUS2;
 
 		u8 PNGCompressionLevel = 1;
 

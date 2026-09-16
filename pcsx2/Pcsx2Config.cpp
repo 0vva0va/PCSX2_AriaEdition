@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2002-2026 PCSX2 Dev Team
+// SPDX-FileCopyrightText: 2002-2026 PCSX2 Dev Team
 // SPDX-License-Identifier: GPL-3.0+
 
 #include "common/CocoaTools.h"
@@ -869,6 +870,9 @@ bool Pcsx2Config::GSOptions::OptionsAreEqual(const GSOptions& right) const
 		OpEqu(ShadeBoost_Contrast) &&
 		OpEqu(ShadeBoost_Saturation) &&
 		OpEqu(ShadeBoost_Gamma) &&
+		OpEqu(FakeHDR_HDRStrength) &&
+		OpEqu(FakeHDR_Radius1) &&
+		OpEqu(FakeHDR_Radius2) &&
 		OpEqu(LumaSharpen_SharpStrength) &&
 		OpEqu(LumaSharpen_SharpClamp) &&
 		OpEqu(LumaSharpen_Pattern) &&
@@ -1013,6 +1017,7 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapBitBoolEx(UserHacks_RewriteLargeSTCoords, "UserHacks_RewriteLargeSTCoords");
 	SettingsWrapBitBoolEx(FXAA, "fxaa");
 	SettingsWrapBitBoolEx(SMAA, "smaa");
+	SettingsWrapBitBool(FakeHDR);
 	SettingsWrapBitBool(ShadeBoost);
 	SettingsWrapBitBool(LumaSharpen);
 	SettingsWrapBitBoolEx(DumpGSData, "DumpGSData");
@@ -1093,6 +1098,9 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapBitfield(ShadeBoost_Contrast);
 	SettingsWrapBitfield(ShadeBoost_Saturation);
 	SettingsWrapBitfield(ShadeBoost_Gamma);
+	SettingsWrapBitfield(FakeHDR_HDRStrength);
+	SettingsWrapBitfield(FakeHDR_Radius1);
+	SettingsWrapBitfield(FakeHDR_Radius2);
 	SettingsWrapBitfield(LumaSharpen_SharpStrength);
 	SettingsWrapBitfield(LumaSharpen_SharpClamp);
 	SettingsWrapBitfield(LumaSharpen_Pattern);

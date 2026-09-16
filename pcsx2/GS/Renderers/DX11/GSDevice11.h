@@ -119,6 +119,7 @@ private:
 	void DoSMAA(GSTexture* sTex, GSTexture* dTex) override;
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
+	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 
 	bool CreateCASShaders();
 	bool DoCAS(GSTexture* sTex, GSTexture* dTex, bool sharpen_only, const std::array<u32, NUM_CAS_CONSTANTS>& constants) override;
@@ -270,6 +271,13 @@ private:
 		wil::com_ptr_nothrow<ID3D11Buffer> cb;
 		float cb_uniforms[4];
 	} m_lumasharpen;
+
+	struct
+	{
+		wil::com_ptr_nothrow<ID3D11PixelShader> ps;
+		wil::com_ptr_nothrow<ID3D11Buffer> cb;
+		float cb_uniforms[4];
+	} m_fakehdr;
 
 	struct
 	{

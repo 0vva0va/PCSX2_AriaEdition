@@ -249,11 +249,16 @@ bool GSRenderer::Merge(int field)
 	if (GSConfig.LumaSharpen)
 		g_gs_device->LumaSharpen();
 
+	if (GSConfig.FakeHDR)
+		g_gs_device->FakeHDR();
+
 	if (GSConfig.FXAA)
 		g_gs_device->FXAA();
 
 	if (GSConfig.SMAA)
 		g_gs_device->SMAA();
+
+	
 
 	switch (GSConfig.AAMode)
 	{

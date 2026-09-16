@@ -211,7 +211,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	//////////////////////////////////////////////////////////////////////////
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.fxaa, "EmuCore/GS", "fxaa", false);
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.smaa, "EmuCore/GS", "smaa", false);
-
+	
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.shadeBoost, "EmuCore/GS", "ShadeBoost", false);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostBrightness, "EmuCore/GS", "ShadeBoost_Brightness", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_BRIGHTNESS);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostContrast, "EmuCore/GS", "ShadeBoost_Contrast", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_CONTRAST);
@@ -223,6 +223,11 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenClamp, "EmuCore/GS", "LumaSharpen_SharpClamp", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_SHARPCLAMP);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenPattern, "EmuCore/GS", "LumaSharpen_Pattern", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_PATTERN);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenOffset, "EmuCore/GS", "LumaSharpen_Offset", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_OFFSET);
+
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.fakehdr, "EmuCore/GS", "fakehdr", false);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.fakeHdrPower, "EmuCore/GS", "FakeHDR_HDRStrength", Pcsx2Config::GSOptions::DEFAULT_FAKEHDR_HDRPOWER);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.fakeHdrRadius1, "EmuCore/GS", "FakeHDR_Radius1", Pcsx2Config::GSOptions::DEFAULT_FAKEHDR_RADIUS1);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.fakeHdrRadius2, "EmuCore/GS", "FakeHDR_Radius2", Pcsx2Config::GSOptions::DEFAULT_FAKEHDR_RADIUS2);
 
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.tvShader, "EmuCore/GS", "TVShader", DEFAULT_TV_SHADER_MODE);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.casMode, "EmuCore/GS", "CASMode", static_cast<int>(Pcsx2Config::GSOptions::DEFAULT_CAS_MODE));
@@ -725,11 +730,12 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 
 		dialog()->registerWidgetHelp(m_post.casSharpness, tr("Sharpness"), tr("50%"), tr("Determines the intensity the sharpening effect in CAS post-processing."));
 
-		dialog()->registerWidgetHelp(m_post.shadeBoost, tr("Shade Boost"), tr("Unchecked"), tr("Enables saturation, contrast, and brightness to be adjusted. Values of brightness, saturation, and contrast are at default ""50."));
+		
 
 		dialog()->registerWidgetHelp(m_post.fxaa, tr("FXAA"), tr("Unchecked"), tr("Applies the FXAA anti-aliasing algorithm to improve the visual quality of games."));
 		dialog()->registerWidgetHelp(m_post.smaa, tr("SMAA"), tr("Unchecked"), tr("Applies the SMAA anti-aliasing algorithm to improve the visual quality of games."));
 
+		dialog()->registerWidgetHelp(m_post.shadeBoost, tr("Shade Boost"), tr("Unchecked"), tr("Enables saturation, contrast, and brightness to be adjusted. Values of brightness, saturation, and contrast are at default "														   "50."));
 		dialog()->registerWidgetHelp(m_post.shadeBoostBrightness, tr("Brightness"), tr("50"), tr("Adjusts brightness. 50 is normal."));
 		dialog()->registerWidgetHelp(m_post.shadeBoostContrast, tr("Contrast"), tr("50"), tr("Adjusts contrast. 50 is normal."));
 		dialog()->registerWidgetHelp(m_post.shadeBoostGamma, tr("Gamma"), tr("50"), tr("Adjusts gamma. 50 is normal."));
@@ -740,6 +746,11 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 		dialog()->registerWidgetHelp(m_post.lumaSharpenClamp, tr("Clamp"), tr("0.1"), tr("Adjusts the clamp value for the Luma Sharpening effect."));
 		dialog()->registerWidgetHelp(m_post.lumaSharpenPattern, tr("Pattern"), tr("0"), tr("Selects the pattern for the Luma Sharpening effect."));
 		dialog()->registerWidgetHelp(m_post.lumaSharpenOffset, tr("Offset"), tr("0"), tr("Adjusts the offset for the Luma Sharpening effect."));
+
+		dialog()->registerWidgetHelp(m_post.fakehdr, tr("Fake HDR"), tr("Unchecked"), tr("Enables Fake HDR effect."));
+		dialog()->registerWidgetHelp(m_post.fakeHdrPower, tr("HDR Strength"), tr("1.3"), tr("Adjusts the strength of the Fake HDR effect."));
+		dialog()->registerWidgetHelp(m_post.fakeHdrRadius1, tr("HDR Radius 1"), tr("0.793"), tr("Adjusts the radius for the first HDR effect."));
+		dialog()->registerWidgetHelp(m_post.fakeHdrRadius2, tr("HDR Radius 2"), tr("0.87"), tr("Adjusts the radius for the second HDR effect."));
 
 		dialog()->registerWidgetHelp(m_post.tvShader, tr("TV Shader"), tr("None (Default)"), tr("Applies a shader which replicates the visual effects of different styles of television sets."));
 	}
