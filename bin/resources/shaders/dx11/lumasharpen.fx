@@ -11,14 +11,14 @@ cbuffer cb0
 
 
 // ----------------------------------------------
-float4 LumaSharpenPass(float4 sColour, float2 tex, float2 pixelSize)
+float4 LumaSharpenPass(float2 tex, float2 pixelSize)
 {
     float sharp_strength = params.x;
     float sharp_clamp    = params.y;
     int   pattern        = (int)params.z;
     float offset_bias    = params.w;
 
-    float3 ori = sColour.rgb; // ori = original pixel
+    float3 ori = Texture.Sample(Sampler, tex).rgb; // ori = original pixel
 
     float3 sharp_strength_luma = (CoefLuma * sharp_strength); // combining the strength and luma multipliers
 
@@ -127,7 +127,5 @@ float4 ps_main(PS_INPUT input) : SV_Target0
     
     float2 pixelSizeRcp = float2(1.0 / pixelSize.x, 1.0 / pixelSize.y);
 
-	float4 c = Texture.Sample(Sampler, input.t);
-    
-	return LumaSharpenPass(c, input.t, pixelSizeRcp);
+	return LumaSharpenPass(input.t, pixelSizeRcp);
 }

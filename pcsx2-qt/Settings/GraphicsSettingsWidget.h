@@ -45,6 +45,7 @@ private Q_SLOTS:
 	void onTextureReplacementChanged();
 	void onShadeBoostChanged();
 	void onLumaSharpenChanged();
+	void onFakeHDRChanged();
 	void onCaptureContainerChanged();
 	void onCaptureCodecChanged();
 	void onEnableVideoCaptureChanged();

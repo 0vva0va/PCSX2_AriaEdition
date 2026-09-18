@@ -240,6 +240,9 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	connect(m_post.lumaSharpen, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onLumaSharpenChanged);
 	onLumaSharpenChanged();
 
+	connect(m_post.fakehdr, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onFakeHDRChanged);
+	onFakeHDRChanged();
+
 	//////////////////////////////////////////////////////////////////////////
 	// Advanced Settings
 	//////////////////////////////////////////////////////////////////////////
@@ -952,6 +955,15 @@ void GraphicsSettingsWidget::onLumaSharpenChanged()
 	m_post.lumaSharpenClamp->setEnabled(enabled);
 	m_post.lumaSharpenPattern->setEnabled(enabled);
 	m_post.lumaSharpenOffset->setEnabled(enabled);
+	g_emu_thread->applySettings();
+}
+
+void GraphicsSettingsWidget::onFakeHDRChanged()
+{
+	const bool enabled = dialog()->getEffectiveBoolValue("EmuCore/GS", "FakeHDR", false);
+	m_post.fakeHdrPower->setEnabled(enabled);
+	m_post.fakeHdrRadius1->setEnabled(enabled);
+	m_post.fakeHdrRadius2->setEnabled(enabled);
 	g_emu_thread->applySettings();
 }
 
