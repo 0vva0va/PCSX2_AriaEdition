@@ -1495,6 +1495,7 @@ protected:
 	GSTexture* m_blend = nullptr;
 	GSTexture* m_mad = nullptr;
 	GSTexture* m_target_tmp = nullptr;
+	GSTexture* m_target_tmp2 = nullptr;
 	GSTexture* m_current = nullptr;
 	GSTexture* m_cas = nullptr;
 	GSTexture* m_colclip_rt = nullptr; ///< Temp hw colclip texture

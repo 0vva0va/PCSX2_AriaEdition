@@ -744,15 +744,15 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 		dialog()->registerWidgetHelp(m_post.shadeBoostGamma, tr("Gamma"), tr("50"), tr("Adjusts gamma. 50 is normal."));
 		dialog()->registerWidgetHelp(m_post.shadeBoostSaturation, tr("Saturation"), tr("50"), tr("Adjusts saturation. 50 is normal."));
 
-		dialog()->registerWidgetHelp(m_post.lumaSharpen, tr("Luma Sharpen"), tr("Unchecked"), tr("Applies the Luma Sharpening algorithm to improve the visual quality of games."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpen, tr("Luma Sharpen"), tr("Unchecked"), tr("Applies the Luma Sharpening algorithm to improve the visual quality of games. Recommended to only use one type of sharpening at a time."));
 		dialog()->registerWidgetHelp(m_post.lumaSharpenSharpness, tr("Sharpness"), tr("1.0"), tr("Adjusts the sharpness of the Luma Sharpening effect."));
-		dialog()->registerWidgetHelp(m_post.lumaSharpenClamp, tr("Clamp"), tr("0.1"), tr("Adjusts the clamp value for the Luma Sharpening effect."));
-		dialog()->registerWidgetHelp(m_post.lumaSharpenPattern, tr("Pattern"), tr("0"), tr("Selects the pattern for the Luma Sharpening effect."));
-		dialog()->registerWidgetHelp(m_post.lumaSharpenOffset, tr("Offset"), tr("0"), tr("Adjusts the offset for the Luma Sharpening effect."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenClamp, tr("Clamp"), tr("0.04"), tr("Adjusts the clamp value for the Luma Sharpening effect."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenPattern, tr("Pattern"), tr("1"), tr("Selects the pattern for the Luma Sharpening effect."));
+		dialog()->registerWidgetHelp(m_post.lumaSharpenOffset, tr("Offset"), tr("1"), tr("Adjusts the offset for the Luma Sharpening effect."));
 
 		dialog()->registerWidgetHelp(m_post.fakehdr, tr("Fake HDR"), tr("Unchecked"), tr("Enables Fake HDR effect."));
 		dialog()->registerWidgetHelp(m_post.fakeHdrPower, tr("HDR Strength"), tr("1.3"), tr("Adjusts the strength of the Fake HDR effect."));
-		dialog()->registerWidgetHelp(m_post.fakeHdrRadius1, tr("HDR Radius 1"), tr("0.793"), tr("Adjusts the radius for the first HDR effect."));
+		dialog()->registerWidgetHelp(m_post.fakeHdrRadius1, tr("HDR Radius 1"), tr("0.79"), tr("Adjusts the radius for the first HDR effect."));
 		dialog()->registerWidgetHelp(m_post.fakeHdrRadius2, tr("HDR Radius 2"), tr("0.87"), tr("Adjusts the radius for the second HDR effect."));
 
 		dialog()->registerWidgetHelp(m_post.tvShader, tr("TV Shader"), tr("None (Default)"), tr("Applies a shader which replicates the visual effects of different styles of television sets."));

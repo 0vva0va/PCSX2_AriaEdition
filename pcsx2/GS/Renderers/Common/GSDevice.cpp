@@ -251,7 +251,7 @@ GSDevice::GSDevice()
 GSDevice::~GSDevice()
 {
 	// should've been cleaned up in Destroy()
-	pxAssert(m_pool[0].empty() && m_pool[1].empty() && !m_merge && !m_weavebob && !m_blend && !m_mad && !m_target_tmp && !m_cas);
+	pxAssert(m_pool[0].empty() && m_pool[1].empty() && !m_merge && !m_weavebob && !m_blend && !m_mad && !m_target_tmp && !m_target_tmp2 && !m_cas);
 }
 
 const char* GSDevice::RenderAPIToString(RenderAPI api)
@@ -931,6 +931,7 @@ void GSDevice::ClearCurrent()
 	delete m_blend;
 	delete m_mad;
 	delete m_target_tmp;
+	delete m_target_tmp2;
 	delete m_cas;
 
 	m_merge = nullptr;
@@ -938,6 +939,7 @@ void GSDevice::ClearCurrent()
 	m_blend = nullptr;
 	m_mad = nullptr;
 	m_target_tmp = nullptr;
+	m_target_tmp2 = nullptr;
 	m_cas = nullptr;
 }
 
@@ -1058,7 +1060,7 @@ void GSDevice::ShadeBoost()
 
 void GSDevice::LumaSharpen()
 {
-	if (ResizeRenderTarget(&m_target_tmp, m_current->GetWidth(), m_current->GetHeight(), false, false))
+	if (ResizeRenderTarget(&m_target_tmp2, m_current->GetWidth(), m_current->GetHeight(), false, false))
 	{
 		const GSVector4 params(
 			static_cast<float>(GSConfig.LumaSharpen_SharpStrength),
@@ -1067,9 +1069,9 @@ void GSDevice::LumaSharpen()
 			static_cast<float>(GSConfig.LumaSharpen_Offset)
 		);
 
-		DoLumaSharpen(m_current, m_target_tmp, params.v);
+		DoLumaSharpen(m_current, m_target_tmp2, params.v);
 
-		m_current = m_target_tmp;
+		m_current = m_target_tmp2;
 	}
 }
 

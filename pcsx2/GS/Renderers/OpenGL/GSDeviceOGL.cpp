@@ -578,7 +578,8 @@ bool GSDeviceOGL::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 	// ****************************************************************
 	// Compile post-processing shaders that may be used later (ensure uniforms are registered)
 	if (!CompileShadeBoostProgram()  || 
-	    !CompileFXAAProgram()        || 
+	    !CompileFXAAProgram()        ||
+		!CompileSMAAProgram()        ||
 		!CompileLumaSharpenProgram() ||
 		!CompileFakeHDRProgram())
 		return false;
