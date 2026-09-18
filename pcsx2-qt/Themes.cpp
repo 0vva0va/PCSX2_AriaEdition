@@ -10,6 +10,8 @@
 
 #include <QtCore/QFile>
 #include <QtGui/QPalette>
+#include <QtGui/QFontDatabase>
+#include <QtGui/QFont>
 #include <QtGui/QPixmapCache>
 #include <QtGui/QStyleHints>
 #include <QtWidgets/QApplication>
@@ -25,6 +27,7 @@ namespace QtHost
 static QString s_unthemed_style_name;
 static QPalette s_unthemed_palette;
 static bool s_unthemed_style_name_set;
+static QFont s_unthemed_font;
 
 // This is different than the result of qApp->styleHints()->colorScheme() since
 // if we set that to Qt::ColorScheme::Unknown it would return what the Qt
@@ -48,6 +51,7 @@ void QtHost::UpdateApplicationTheme()
 		s_unthemed_style_name_set = true;
 		s_unthemed_style_name = QApplication::style()->objectName();
 		s_unthemed_palette = QApplication::palette();
+		s_unthemed_font = qApp->font();
 	}
 
 	SetStyleFromSettings();
@@ -611,33 +615,94 @@ void QtHost::SetStyleFromSettings()
 	{
 		qApp->setStyle(QStyleFactory::create("Fusion"));
 
+		// Base palette colors for AriaEdition. Use partially transparent window/base
+		// colors where possible; visual "glass" effect is mainly implemented via
+		// application stylesheet below so widgets render without visible borders and
+		// panels have a semi-transparent background.
 		const QColor deepaqua(60, 83, 154);
+		const QColor deepaqua_alpha(60, 83, 154, 220);
 		const QColor lavendar(208, 179, 204);
 		const QColor venicewhite(244, 248, 250);
 		const QColor akaripink(255, 217, 217);
 
 		QPalette ariaPalette;
-		ariaPalette.setColor(QPalette::Window, deepaqua);
+		ariaPalette.setColor(QPalette::Window, deepaqua_alpha);
 		ariaPalette.setColor(QPalette::WindowText, venicewhite);
-		ariaPalette.setColor(QPalette::Base, deepaqua);
-		ariaPalette.setColor(QPalette::AlternateBase, deepaqua);
+		ariaPalette.setColor(QPalette::Base, deepaqua_alpha);
+		ariaPalette.setColor(QPalette::AlternateBase, deepaqua_alpha);
 		ariaPalette.setColor(QPalette::ToolTipBase, venicewhite);
 		ariaPalette.setColor(QPalette::ToolTipText, venicewhite);
 		ariaPalette.setColor(QPalette::Text, venicewhite);
-		ariaPalette.setColor(QPalette::Button, venicewhite);
+		ariaPalette.setColor(QPalette::Button, deepaqua_alpha);
 		ariaPalette.setColor(QPalette::ButtonText, venicewhite);
 		ariaPalette.setColor(QPalette::Link, venicewhite);
 		ariaPalette.setColor(QPalette::Highlight, lavendar);
 		ariaPalette.setColor(QPalette::HighlightedText, venicewhite);
 
-		ariaPalette.setColor(QPalette::Active, QPalette::Button, deepaqua);
+		ariaPalette.setColor(QPalette::Active, QPalette::Button, deepaqua_alpha);
 		ariaPalette.setColor(QPalette::Disabled, QPalette::ButtonText, venicewhite);
 		ariaPalette.setColor(QPalette::Disabled, QPalette::WindowText, venicewhite);
 		ariaPalette.setColor(QPalette::Disabled, QPalette::Text, venicewhite);
-		ariaPalette.setColor(QPalette::Disabled, QPalette::Light, deepaqua);
+		ariaPalette.setColor(QPalette::Disabled, QPalette::Light, deepaqua_alpha);
 
 		qApp->setPalette(ariaPalette);
-		qApp->setStyleSheet(QString());
+
+		int _aria_font_id = QFontDatabase::addApplicationFont(":/fonts/eurostile.ttf");
+		if (_aria_font_id != -1)
+		{
+			QStringList families = QFontDatabase::applicationFontFamilies(_aria_font_id);
+			if (!families.isEmpty())
+			{
+				QFont f(families.at(0));
+				f.setPointSize(11);
+				qApp->setFont(f);
+			}
+		}
+
+		const QString ariaSheet = R"QSS(
+			QFrame, QGroupBox, QTabWidget::pane, QMenuBar, QToolBar, QStatusBar {
+				background-color: rgba(244, 248, 250, 0);
+				border: none;
+			}
+
+			QTableView {
+				background-color: rgba(244, 248, 250, 0);
+				border: none;
+			}
+
+			QHeaderView::section {
+				background-color: rgba(244, 248, 250, 0);
+				border: none;
+			}
+
+			QGroupBox {
+				margin-top: 0px;
+				padding: 6px;
+				border: none;
+				background-color: rgba(244, 248, 250, 0);
+			}
+
+			QTabWidget::pane {
+				border: none;
+				background-color: transparent;
+			}
+
+			QMenu::separator, QToolBar::separator, QSplitter::handle, QTreeView::branch {
+				background: transparent;
+				border: none;
+			}
+
+			QPushButton, QToolButton {
+				border: none;
+			}
+
+			QListView::item, QTableView::item {
+				border: none;
+			}
+
+		)QSS";
+
+		qApp->setStyleSheet(ariaSheet);
 		SetColorScheme(Qt::ColorScheme::Dark);
 	}
 	else if (theme == "Custom")
@@ -664,6 +729,7 @@ void QtHost::SetStyleFromSettings()
 	{
 		qApp->setStyle(s_unthemed_style_name);
 		qApp->setPalette(s_unthemed_palette);
+		qApp->setFont(s_unthemed_font);
 		qApp->setStyleSheet(QString());
 		SetColorScheme(Qt::ColorScheme::Unknown);
 	}

@@ -238,5 +238,10 @@
 		<file>images/RyojouhenCon.svg</file>
 		<file>images/ShinkansenCon.svg</file>
 		<file>images/bg_image_dither.png</file>
+		<file>images/bg_image_dither2.png</file>
+		<file>images/bg_image_dither3.png</file>
+		<file>images/bg_image_crt.png</file>
+		<file>fonts/Neuropol.otf</file>
+		<file>fonts/eurostile.ttf</file>
 	</qresource>
 </RCC>

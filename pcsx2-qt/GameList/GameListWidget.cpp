@@ -228,13 +228,9 @@ namespace
 	};
 } // namespace
 
-GameListWidget::GameListWidget(QWidget* parent /* = nullptr */)
-	: QWidget(parent)
+GameListWidget::GameListWidget(QWidget* parent /* = nullptr */) : QWidget(parent)
 {
-	// Load any configured custom background early so the widget has it available immediately.
-	// This mirrors behavior done later in initialize() for dynamic changes.
-	// Load the built-in fixed background (covers only the game list area)
-	m_fixed_background_pixmap = QPixmap(QStringLiteral(":/images/bg_image_dither.png"));
+	m_fixed_background_pixmap = QPixmap(QStringLiteral(":/images/bg_image_dither3.png"));
 }
 
 GameListWidget::~GameListWidget() = default;
@@ -252,6 +248,12 @@ void GameListWidget::initialize()
 
 	m_ui.setupUi(this);
 	m_ui.stack->installEventFilter(this);
+
+	if (QWidget* top_window = m_ui.stack->window())
+	{
+		if (top_window != m_ui.stack)
+			top_window->installEventFilter(this);
+	}
 	m_ui.stack->setAutoFillBackground(false);
 
 	for (u32 type = 0; type < static_cast<u32>(GameList::EntryType::Count); type++)
@@ -425,6 +427,7 @@ void GameListWidget::setCustomBackground()
 			m_empty_widget->setAutoFillBackground(false);
 
 			m_ui.stack->update();
+			if (QWidget* w = m_ui.stack->window()) w->update();
 			m_table_view->setAlternatingRowColors(true);
 			return;
 		}
@@ -445,9 +448,10 @@ void GameListWidget::setCustomBackground()
 	m_table_view->viewport()->setAutoFillBackground(false);
 	m_list_view->viewport()->setAutoFillBackground(false);
 
-	// Apply any UI state updates needed and request a repaint
-	m_table_view->setAlternatingRowColors(false);
-	m_ui.stack->update();
+		// Apply any UI state updates needed and request a repaint
+		m_table_view->setAlternatingRowColors(false);
+		m_ui.stack->update();
+		if (QWidget* w = m_ui.stack->window()) w->update();
 }
 
 void GameListWidget::updateCustomBackgroundState()
@@ -463,6 +467,7 @@ void GameListWidget::processBackgroundFrames()
 
 	updateBackgroundTextColor(m_background_pixmap);
 	m_ui.stack->update();
+	if (QWidget* w = m_ui.stack->window()) w->update();
 }
 
 void GameListWidget::updateBackgroundTextColor(const QPixmap& frame)
@@ -831,13 +836,17 @@ bool GameListWidget::event(QEvent* event)
 
 bool GameListWidget::eventFilter(QObject* watched, QEvent* event)
 {
-	if (watched == m_ui.stack && event->type() == QEvent::Paint)
+	if (m_ui.stack->window() && watched == m_ui.stack->window() && event->type() == QEvent::Paint)
 	{
-		QPainter painter(m_ui.stack);
+		QWidget* widget = qobject_cast<QWidget*>(watched);
+		if (!widget)
+			return QWidget::eventFilter(watched, event);
+
+		QPainter painter(widget);
 		painter.setClipRect(static_cast<QPaintEvent*>(event)->rect());
 
-		const QSize widget_size(m_ui.stack->width(), m_ui.stack->height());
-		const qreal dpr = m_ui.stack->devicePixelRatioF();
+		const QSize widget_size(widget->width(), widget->height());
+		const qreal dpr = widget->devicePixelRatioF();
 
 		bool drew = false;
 
