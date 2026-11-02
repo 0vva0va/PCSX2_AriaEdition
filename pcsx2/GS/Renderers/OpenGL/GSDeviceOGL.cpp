@@ -581,7 +581,8 @@ bool GSDeviceOGL::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 	    !CompileFXAAProgram()        ||
 		!CompileSMAAProgram()        ||
 		!CompileLumaSharpenProgram() ||
-		!CompileFakeHDRProgram())
+		!CompileFakeHDRProgram()     ||
+		!CompileTonemappingProgram())
 		return false;
 
 	// Image load store and GLSL 420pack is core in GL4.2, no need to check.
@@ -979,6 +980,8 @@ void GSDeviceOGL::DestroyResources()
 	m_fxaa.ps.Destroy();
 	m_smaa.ps.Destroy();
 	m_fakehdr.ps.Destroy();
+	m_tonemapping.ps.Destroy();
+	m_vibrance.ps.Destroy();
 
 
 	for (GLProgram& prog : m_present)
@@ -2373,6 +2376,79 @@ void GSDeviceOGL::DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float pa
 	const GSVector4 dRect(0, 0, s.x, s.y);
 
 	DoStretchRect(sTex, sRect, dTex, dRect, m_lumasharpen.ps, Nearest);
+}
+
+bool GSDeviceOGL::CompileTonemappingProgram()
+{
+	const std::optional<std::string> shader = ReadShaderSource("shaders/opengl/tonemap.glsl");
+	if (!shader.has_value())
+	{
+		Host::ReportErrorAsync("GS", "Failed to read shaders/opengl/tonemap.glsl");
+		return false;
+	}
+
+	const std::string ps(GetShaderSource("ps_main", GL_FRAGMENT_SHADER, *shader));
+	if (!m_shader_cache.GetProgram(&m_tonemapping.ps, m_convert.vs, ps))
+		return false;
+	m_tonemapping.ps.RegisterUniform("params");
+	m_tonemapping.ps.SetName("Tonemapping pipe");
+	return true;
+}
+
+void GSDeviceOGL::DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4])
+{
+	GL_PUSH("DoTonemapping");
+
+	m_tonemapping.ps.Bind();
+	m_tonemapping.ps.Uniform4fv(0, params);
+	m_tonemapping.ps.Uniform2fv(1, params2);
+	m_tonemapping.ps.Uniform4fv(2, fogColour);
+
+	OMSetColorMaskState();
+
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_tonemapping.ps, Nearest);
+}
+
+bool GSDeviceOGL::CompileVibranceProgram()
+{
+	const std::optional<std::string> shader = ReadShaderSource("shaders/opengl/vibrance.glsl");
+	if (!shader.has_value())
+	{
+		Host::ReportErrorAsync("GS", "Failed to read shaders/opengl/vibrance.glsl");
+		return false;
+	}
+
+	const std::string ps(GetShaderSource("ps_main", GL_FRAGMENT_SHADER, *shader));
+
+	if (!m_shader_cache.GetProgram(&m_vibrance.ps, m_convert.vs, ps))
+		return false;
+
+	m_vibrance.ps.RegisterUniform("params");
+	m_vibrance.ps.SetName("Vibrance pipe");
+
+	return true;
+}
+
+void GSDeviceOGL::DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	GL_PUSH("DoVibrance");
+
+	m_vibrance.ps.Bind();
+	m_vibrance.ps.Uniform4fv(0, params);
+
+	OMSetColorMaskState();
+
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_vibrance.ps, Nearest);
 }
 
 void GSDeviceOGL::SetupDATE(GSTexture* rt, GSTexture* ds, SetDATM datm, const GSVector4i& bbox)

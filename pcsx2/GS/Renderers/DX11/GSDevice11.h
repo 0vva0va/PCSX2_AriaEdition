@@ -120,6 +120,8 @@ private:
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
+	void DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4]) override;
+	void DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 
 	bool CreateCASShaders();
 	bool DoCAS(GSTexture* sTex, GSTexture* dTex, bool sharpen_only, const std::array<u32, NUM_CAS_CONSTANTS>& constants) override;
@@ -278,6 +280,22 @@ private:
 		wil::com_ptr_nothrow<ID3D11Buffer> cb;
 		float cb_uniforms[4];
 	} m_fakehdr;
+
+	struct
+	{
+		wil::com_ptr_nothrow<ID3D11PixelShader> ps;
+		wil::com_ptr_nothrow<ID3D11Buffer> cb;
+		float cb_uniforms[4];
+		float cb_uniforms2[2];
+		float cb_fog_colour[4];
+	} m_tonemapping;
+
+	struct
+	{
+		wil::com_ptr_nothrow<ID3D11PixelShader> ps;
+		wil::com_ptr_nothrow<ID3D11Buffer> cb;
+		float cb_uniforms[4];
+	} m_vibrance;
 
 	struct
 	{

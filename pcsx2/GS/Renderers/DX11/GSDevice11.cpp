@@ -408,6 +408,37 @@ bool GSDevice11::Create(GSVSyncMode vsync_mode, bool allow_present_throttle)
 	if (!m_fakehdr.ps)
 		return false;
 
+	// Tonemapping
+	memset(&bd, 0, sizeof(bd));
+	bd.ByteWidth = sizeof(float) * 4;
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	m_dev->CreateBuffer(&bd, nullptr, m_tonemapping.cb.put());
+
+	shader = ReadShaderSource("shaders/dx11/tonemap.fx");
+	if (!shader.has_value())
+		return false;
+	m_tonemapping.ps = m_shader_cache.GetPixelShader(m_dev.get(), *shader, nullptr, "ps_main");
+	if (!m_tonemapping.ps)
+		return false;
+
+	// Vibrance
+	memset(&bd, 0, sizeof(bd));
+	bd.ByteWidth = sizeof(float) * 4;
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	m_dev->CreateBuffer(&bd, nullptr, m_vibrance.cb.put());
+
+	shader = ReadShaderSource("shaders/dx11/vibrance.fx");
+	if (!shader.has_value())
+		return false;
+	m_vibrance.ps = m_shader_cache.GetPixelShader(m_dev.get(), *shader, nullptr, "ps_main");
+	if (!m_vibrance.ps)
+		return false;
+
+
 
 	// Vertex/Index Buffer
 	bd = {};
@@ -661,6 +692,8 @@ void GSDevice11::Destroy()
 	m_shadeboost = {};
 	m_lumasharpen = {};
 	m_fakehdr = {};
+	m_tonemapping = {};
+	m_vibrance = {};
 	m_date = {};
 	m_cas = {};
 	m_imgui = {};
@@ -2064,6 +2097,32 @@ void GSDevice11::DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[
 	UpdateSubresource(m_fakehdr.cb.get(), params, &m_fakehdr.cb_uniforms, sizeof(float) * 4);
 
 	DoStretchRect(sTex, sRect, dTex, dRect, m_fakehdr.ps.get(), m_fakehdr.cb.get(), Nearest);
+}
+
+void GSDevice11::DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4])
+{
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	UpdateSubresource(m_tonemapping.cb.get(), params, &m_tonemapping.cb_uniforms, sizeof(float) * 4);
+	UpdateSubresource(m_tonemapping.cb.get(), params2, &m_tonemapping.cb_uniforms2, sizeof(float) * 2);
+	UpdateSubresource(m_tonemapping.cb.get(), fogColour, &m_tonemapping.cb_fog_colour, sizeof(float) * 4);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_tonemapping.ps.get(), m_tonemapping.cb.get(), Nearest);
+}
+
+void GSDevice11::DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	const GSVector2i s = dTex->GetSize();
+
+	const GSVector4 sRect(0, 0, 1, 1);
+	const GSVector4 dRect(0, 0, s.x, s.y);
+
+	UpdateSubresource(m_vibrance.cb.get(), params, &m_vibrance.cb_uniforms, sizeof(float) * 4);
+
+	DoStretchRect(sTex, sRect, dTex, dRect, m_vibrance.ps.get(), m_vibrance.cb.get(), Nearest);
 }
 
 void GSDevice11::SetupVS(VSSelector sel, const GSHWDrawConfig::VSConstantBuffer* cb)

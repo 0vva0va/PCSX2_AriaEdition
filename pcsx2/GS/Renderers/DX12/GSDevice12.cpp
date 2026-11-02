@@ -2299,6 +2299,46 @@ void GSDevice12::DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[
 	static_cast<GSTexture12*>(dTex)->TransitionToState(GSTexture12::ResourceState::PixelShaderResource);
 }
 
+void GSDevice12::DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4])
+{
+	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
+	const GSVector4i dRect = dTex->GetRect();
+	EndRenderPass();
+	OMSetRenderTargets(dTex, nullptr, nullptr, dRect);
+	SetUtilityRootSignature();
+	SetUtilityTexture(sTex, m_point_sampler_cpu);
+	BeginRenderPass(D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_DISCARD, D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE,
+		D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_NO_ACCESS, D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_NO_ACCESS);
+	dTex->SetState(GSTexture::State::Dirty);
+	SetPipeline(m_tonemapping_pipeline.get());
+	SetUtilityPushConstants(params, sizeof(float) * 4);
+	SetUtilityPushConstants(params2, sizeof(float) * 2);
+	SetUtilityPushConstants(fogColour, sizeof(float) * 4);
+	DrawStretchRect(sRect, GSVector4(dRect), dTex->GetSize());
+	EndRenderPass();
+
+	static_cast<GSTexture12*>(dTex)->TransitionToState(GSTexture12::ResourceState::PixelShaderResource);
+}
+
+void GSDevice12::DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
+	const GSVector4i dRect = dTex->GetRect();
+	EndRenderPass();
+	OMSetRenderTargets(dTex, nullptr, nullptr, dRect);
+	SetUtilityRootSignature();
+	SetUtilityTexture(sTex, m_point_sampler_cpu);
+	BeginRenderPass(D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_DISCARD, D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_PRESERVE,
+		D3D12_RENDER_PASS_BEGINNING_ACCESS_TYPE_NO_ACCESS, D3D12_RENDER_PASS_ENDING_ACCESS_TYPE_NO_ACCESS);
+	dTex->SetState(GSTexture::State::Dirty);
+	SetPipeline(m_vibrance_pipeline.get());
+	SetUtilityPushConstants(params, sizeof(float) * 4);
+	DrawStretchRect(sRect, GSVector4(dRect), dTex->GetSize());
+	EndRenderPass();
+
+	static_cast<GSTexture12*>(dTex)->TransitionToState(GSTexture12::ResourceState::PixelShaderResource);
+}
+
 void GSDevice12::DoFXAA(GSTexture* sTex, GSTexture* dTex)
 {
 	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
@@ -3216,6 +3256,7 @@ bool GSDevice12::CompilePostProcessingPipelines()
 		D3D12::SetObjectName(m_lumasharpen_pipeline.get(), "LumaSharpen pipeline");
 	}
 
+	// Fake HDR pipeline
 	{
 		const std::optional<std::string> shader = ReadShaderSource("shaders/dx11/fakehdr.fx");
 		if (!shader)
@@ -3235,6 +3276,50 @@ bool GSDevice12::CompilePostProcessingPipelines()
 			return false;
 
 		D3D12::SetObjectName(m_fakehdr_pipeline.get(), "FakeHDR pipeline");
+	}
+
+	// Tonemapping pipeline
+	{
+		const std::optional<std::string> shader = ReadShaderSource("shaders/dx11/tonemap.fx");
+		if (!shader)
+		{
+			Host::ReportErrorAsync("GS", "Failed to read shaders/dx11/tonemap.fx");
+			return false;
+		}
+
+		ComPtr<ID3DBlob> ps(GetUtilityPixelShader(*shader, "ps_main"));
+		if (!ps)
+			return false;
+
+		gpb.SetPixelShader(ps.get());
+
+		m_tonemapping_pipeline = gpb.Create(m_device.get(), m_shader_cache, false);
+		if (!m_tonemapping_pipeline)
+			return false;
+
+		D3D12::SetObjectName(m_tonemapping_pipeline.get(), "Tonemapping pipeline");
+	}
+
+	// Vibrance pipeline
+	{
+		const std::optional<std::string> shader = ReadShaderSource("shaders/dx11/vibrance.fx");
+		if (!shader)
+		{
+			Host::ReportErrorAsync("GS", "Failed to read shaders/dx11/vibrance.fx");
+			return false;
+		}
+
+		ComPtr<ID3DBlob> ps(GetUtilityPixelShader(*shader, "ps_main"));
+		if (!ps)
+			return false;
+
+		gpb.SetPixelShader(ps.get());
+
+		m_vibrance_pipeline = gpb.Create(m_device.get(), m_shader_cache, false);
+		if (!m_vibrance_pipeline)
+			return false;
+
+		D3D12::SetObjectName(m_vibrance_pipeline.get(), "Vibrance pipeline");
 	}
 
 	return true;
@@ -3263,6 +3348,8 @@ void GSDevice12::DestroyResources()
 	m_fakehdr_pipeline.reset();
 	m_shadeboost_pipeline.reset();
 	m_lumasharpen_pipeline.reset();
+	m_tonemapping_pipeline.reset();
+	m_vibrance_pipeline.reset();
 	m_imgui_pipeline.reset();
 
 	for (const auto& it : m_samplers)

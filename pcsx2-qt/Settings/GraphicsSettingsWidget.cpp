@@ -209,8 +209,8 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	//////////////////////////////////////////////////////////////////////////
 	// Post-Processing Settings
 	//////////////////////////////////////////////////////////////////////////
-	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.fxaa, "EmuCore/GS", "fxaa", false);
-	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.smaa, "EmuCore/GS", "smaa", false);
+	//SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.fxaa, "EmuCore/GS", "fxaa", false);
+	//SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.smaa, "EmuCore/GS", "smaa", false);
 	
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.shadeBoost, "EmuCore/GS", "ShadeBoost", false);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostBrightness, "EmuCore/GS", "ShadeBoost_Brightness", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_BRIGHTNESS);
@@ -218,12 +218,14 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostGamma, "EmuCore/GS", "ShadeBoost_Gamma", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_GAMMA);
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.shadeBoostSaturation, "EmuCore/GS", "ShadeBoost_Saturation", Pcsx2Config::GSOptions::DEFAULT_SHADEBOOST_SATURATION);
 
+	// Luma Sharpen
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.lumaSharpen, "EmuCore/GS", "LumaSharpen", false);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenSharpness, "EmuCore/GS", "LumaSharpen_SharpStrength", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_SHARPSTRENGTH);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenClamp, "EmuCore/GS", "LumaSharpen_SharpClamp", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_SHARPCLAMP);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenPattern, "EmuCore/GS", "LumaSharpen_Pattern", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_PATTERN);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.lumaSharpenOffset, "EmuCore/GS", "LumaSharpen_Offset", Pcsx2Config::GSOptions::DEFAULT_LUMASHARPEN_OFFSET);
 
+	// Fake HDR
 	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.fakehdr, "EmuCore/GS", "fakehdr", false);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.fakeHdrPower, "EmuCore/GS", "FakeHDR_HDRStrength", Pcsx2Config::GSOptions::DEFAULT_FAKEHDR_HDRPOWER);
 	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.fakeHdrRadius1, "EmuCore/GS", "FakeHDR_Radius1", Pcsx2Config::GSOptions::DEFAULT_FAKEHDR_RADIUS1);
@@ -234,6 +236,24 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.aaMode, "EmuCore/GS", "AAMode", static_cast<int>(Pcsx2Config::GSOptions::DEFAULT_AA_MODE));
 	SettingWidgetBinder::BindWidgetToIntSetting(sif, m_post.casSharpness, "EmuCore/GS", "CASSharpness", DEFAULT_CAS_SHARPNESS);
 
+	// Tonemapping
+	SettingWidgetBinder::BindWidgetToBoolSetting(sif, m_post.tonemapping, "EmuCore/GS", "Tonemapping", false);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingGamma, "EmuCore/GS", "Tonemapping_Variable1", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_GAMMA);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingExposure, "EmuCore/GS", "Tonemapping_Variable2", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_EXPOSURE);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingSaturation, "EmuCore/GS", "Tonemapping_Variable3", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_SATURATION);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingBleach, "EmuCore/GS", "Tonemapping_Variable4", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_BLEACH);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingDefog, "EmuCore/GS", "Tonemapping_Variable5", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_DEFOG);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingFogColourR, "EmuCore/GS", "Tonemapping_Variable6_R", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_FOG_COLOUR_R);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingFogColourG, "EmuCore/GS", "Tonemapping_Variable6_G", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_FOG_COLOUR_G);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.tonemappingFogColourB, "EmuCore/GS", "Tonemapping_Variable6_B", Pcsx2Config::GSOptions::DEFAULT_TONEMAPPING_FOG_COLOUR_B);
+
+	// Vibrance
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.vibranceStrength, "EmuCore/GS", "Vibrance", Pcsx2Config::GSOptions::DEFAULT_VIBRANCE_STRENGTH);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.vibranceRGBBalanceR, "EmuCore/GS", "Vibrance_RGBBalance_R", Pcsx2Config::GSOptions::DEFAULT_VIBRANCERGBBALANCE_R);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.vibranceRGBBalanceG, "EmuCore/GS", "Vibrance_RGBBalance_G", Pcsx2Config::GSOptions::DEFAULT_VIBRANCERGBBALANCE_G);
+	SettingWidgetBinder::BindWidgetToFloatSetting(sif, m_post.vibranceRGBBalanceB, "EmuCore/GS", "Vibrance_RGBBalance_B", Pcsx2Config::GSOptions::DEFAULT_VIBRANCERGBBALANCE_B);
+
+
 	connect(m_post.shadeBoost, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onShadeBoostChanged);
 	onShadeBoostChanged();
 
@@ -242,6 +262,13 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 
 	connect(m_post.fakehdr, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onFakeHDRChanged);
 	onFakeHDRChanged();
+
+	connect(m_post.tonemapping, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onTonemappingChanged);
+	onTonemappingChanged();
+
+	connect(m_post.vibrance, &QCheckBox::checkStateChanged, this, &GraphicsSettingsWidget::onVibranceChanged);
+	onVibranceChanged();
+
 
 	//////////////////////////////////////////////////////////////////////////
 	// Advanced Settings
@@ -735,8 +762,8 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 
 		
 
-		dialog()->registerWidgetHelp(m_post.fxaa, tr("FXAA"), tr("Unchecked"), tr("Applies the FXAA anti-aliasing algorithm to improve the visual quality of games."));
-		dialog()->registerWidgetHelp(m_post.smaa, tr("SMAA"), tr("Unchecked"), tr("Applies the SMAA anti-aliasing algorithm to improve the visual quality of games."));
+		//dialog()->registerWidgetHelp(m_post.fxaa, tr("FXAA"), tr("Unchecked"), tr("Applies the FXAA anti-aliasing algorithm to improve the visual quality of games."));
+		//dialog()->registerWidgetHelp(m_post.smaa, tr("SMAA"), tr("Unchecked"), tr("Applies the SMAA anti-aliasing algorithm to improve the visual quality of games."));
 
 		dialog()->registerWidgetHelp(m_post.shadeBoost, tr("Shade Boost"), tr("Unchecked"), tr("Enables saturation, contrast, and brightness to be adjusted. Values of brightness, saturation, and contrast are at default "														   "50."));
 		dialog()->registerWidgetHelp(m_post.shadeBoostBrightness, tr("Brightness"), tr("50"), tr("Adjusts brightness. 50 is normal."));
@@ -754,6 +781,22 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 		dialog()->registerWidgetHelp(m_post.fakeHdrPower, tr("HDR Strength"), tr("1.3"), tr("Adjusts the strength of the Fake HDR effect."));
 		dialog()->registerWidgetHelp(m_post.fakeHdrRadius1, tr("HDR Radius 1"), tr("0.79"), tr("Adjusts the radius for the first HDR effect."));
 		dialog()->registerWidgetHelp(m_post.fakeHdrRadius2, tr("HDR Radius 2"), tr("0.87"), tr("Adjusts the radius for the second HDR effect."));
+
+		dialog()->registerWidgetHelp(m_post.tonemapping, tr("Tonemapping"), tr("Unchecked"), tr("Enables the Tonemapping effect."));
+		dialog()->registerWidgetHelp(m_post.tonemappingGamma, tr("Tonemapping Gamma"), tr("1.0"), tr("Placeholder description for Tonemapping parameter 1."));
+		dialog()->registerWidgetHelp(m_post.tonemappingExposure, tr("Tonemapping Exposure"), tr("0.0"), tr("Placeholder description for Tonemapping parameter 2."));
+		dialog()->registerWidgetHelp(m_post.tonemappingSaturation, tr("Tonemapping Saturation"), tr("0.0"), tr("Placeholder description for Tonemapping parameter 3."));
+		dialog()->registerWidgetHelp(m_post.tonemappingBleach, tr("Tonemapping Bleach"), tr("0.0"), tr("Placeholder description for Tonemapping parameter 4."));
+		dialog()->registerWidgetHelp(m_post.tonemappingDefog, tr("Tonemapping Defog"), tr("0.0"), tr("Placeholder description for Tonemapping parameter 5."));
+		dialog()->registerWidgetHelp(m_post.tonemappingFogColourR, tr("Tonemapping Fog Colour Red"), tr("0.0"), tr("Placeholder description for the red component of Tonemapping parameter 6."));
+		dialog()->registerWidgetHelp(m_post.tonemappingFogColourG, tr("Tonemapping Fog Colour Green"), tr("0.0"), tr("Placeholder description for the green component of Tonemapping parameter 6."));
+		dialog()->registerWidgetHelp(m_post.tonemappingFogColourB, tr("Tonemapping Fog Colour Blue"), tr("1.0"), tr("Placeholder description for the blue component of Tonemapping parameter 6."));
+		
+		dialog()->registerWidgetHelp(m_post.vibrance, tr("Vibrance"), tr("Unchecked"), tr("Enables the Vibrance effect."));
+		dialog()->registerWidgetHelp(m_post.vibranceStrength, tr("Vibrance Strength"), tr("0.15"), tr("Placeholder description for Vibrance parameter 1."));
+		dialog()->registerWidgetHelp(m_post.vibranceRGBBalanceR, tr("Vibrance RGB Balance Red"), tr("1.0"), tr("Placeholder description for the red component of Vibrance parameter 2."));
+		dialog()->registerWidgetHelp(m_post.vibranceRGBBalanceG, tr("Vibrance RGB Balance Green"), tr("1.0"), tr("Placeholder description for the green component of Vibrance parameter 2."));
+		dialog()->registerWidgetHelp(m_post.vibranceRGBBalanceB, tr("Vibrance RGB Balance Blue"), tr("1.0"), tr("Placeholder description for the blue component of Vibrance parameter 2."));
 
 		dialog()->registerWidgetHelp(m_post.tvShader, tr("TV Shader"), tr("None (Default)"), tr("Applies a shader which replicates the visual effects of different styles of television sets."));
 	}
@@ -817,6 +860,45 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 	{
 		dialog()->registerWidgetHelp(m_advanced.gsDumpCompression, tr("GS Dump Compression"), tr("Zstandard (zst)"),
 			tr("Change the compression algorithm used when creating a GS dump."));
+		//: Blit = a data operation. You might want to write it as-is, but fully uppercased. More information: https://en.wikipedia.org/wiki/Bit_blit \nSwap chain: see Microsoft's Terminology Portal.
+		dialog()->registerWidgetHelp(m_advanced.useBlitSwapChain, tr("Use Blit Swap Chain"), tr("Unchecked"),
+			//: Blit = a data operation. You might want to write it as-is, but fully uppercased. More information: https://en.wikipedia.org/wiki/Bit_blit
+			tr("Uses a blit presentation model instead of flipping when using the Direct3D 11 "
+			   "graphics API. This usually results in slower performance, but may be required for some "
+			   "streaming applications, or to uncap framerates on some systems."));
+		dialog()->registerWidgetHelp(m_advanced.exclusiveFullscreenControl, tr("Allow Exclusive Fullscreen"), tr("Automatic (Default)"),
+			tr("Overrides the driver's heuristics for enabling exclusive fullscreen, or direct flip/scanout.<br>"
+			   "Disallowing exclusive fullscreen may enable smoother task switching and overlays, but increase input latency."));
+		dialog()->registerWidgetHelp(m_advanced.overrideTextureBarriers, tr("Override Texture Barriers"), tr("Automatic (Default)"),
+			tr("Forces texture barrier functionality to the specified value."));
+		dialog()->registerWidgetHelp(m_advanced.rovBarriersVK, tr("ROV Barriers Vulkan"), tr("Unchecked"),
+			tr("Forces extra barriers when using ROV with Vulkan to fix graphical issues present in some games and hardware configurations."));
+		dialog()->registerWidgetHelp(m_advanced.disableFramebufferFetch, tr("Disable Framebuffer Fetch"), tr("Unchecked"),
+			tr("Prevents the usage of framebuffer fetch when supported by host GPU."));
+		dialog()->registerWidgetHelp(m_advanced.disableShaderCache, tr("Disable Shader Cache"), tr("Unchecked"),
+			tr("Prevents the loading and saving of shaders/pipelines to disk."));
+		dialog()->registerWidgetHelp(m_advanced.disableVertexShaderExpand, tr("Disable Vertex Shader Expand"), tr("Unchecked"),
+			tr("Falls back to the CPU for expanding sprites/lines."));
+		dialog()->registerWidgetHelp(m_advanced.disableMailboxPresentation, tr("Disable Mailbox Presentation"), tr("Unchecked"),
+			tr("Forces the use of FIFO over Mailbox presentation, i.e. double buffering instead of triple buffering. "
+			   "Usually results in worse frame pacing."));
+		dialog()->registerWidgetHelp(m_advanced.extendedUpscales, tr("Extended Upscaling Multipliers"), tr("Unchecked"),
+			tr("Displays additional, very high upscaling multipliers dependent on GPU and driver capability."));
+		dialog()->registerWidgetHelp(m_advanced.useDebugDevice, tr("Use Debug Device"), tr("Unchecked"),
+			tr("Enables API-level validation of graphics commands."));
+		dialog()->registerWidgetHelp(m_advanced.useDebugBlend, tr("Use Debug Blend"), tr("Unchecked"),
+			tr("Forces SW blending and disables several optimizations."));
+		dialog()->registerWidgetHelp(m_advanced.gsDownloadMode, tr("GS Download Mode"), tr("Accurate"),
+			tr("Skips synchronizing with the GS thread and host GPU for GS downloads. "
+			   "Can result in a large speed boost on slower systems, at the cost of many broken graphical effects. "
+			   "If games are broken and you have this option enabled, please disable it first."));
+		dialog()->registerWidgetHelp(m_advanced.ntscFrameRate, tr("NTSC Frame Rate"), tr("59.94 Hz"),
+			tr("Determines what frame rate NTSC games run at."));
+		dialog()->registerWidgetHelp(m_advanced.palFrameRate, tr("PAL Frame Rate"), tr("50.00 Hz"),
+			tr("Determines what frame rate PAL games run at."));
+	}
+		dialog()->registerWidgetHelp(m_advanced.gsDumpCompression, tr("GS Dump Compression"), tr("Zstandard (zst)"),
+			tr("Change the compression algorithm used when creating a GS dump."));
 
 		//: Blit = a data operation. You might want to write it as-is, but fully uppercased. More information: https://en.wikipedia.org/wiki/Bit_blit \nSwap chain: see Microsoft's Terminology Portal.
 		dialog()->registerWidgetHelp(m_advanced.useBlitSwapChain, tr("Use Blit Swap Chain"), tr("Unchecked"),
@@ -867,7 +949,7 @@ GraphicsSettingsWidget::GraphicsSettingsWidget(SettingsWindow* settings_dialog, 
 
 		dialog()->registerWidgetHelp(m_advanced.palFrameRate, tr("PAL Frame Rate"), tr("50.00 Hz"),
 			tr("Determines what frame rate PAL games run at."));
-	}
+	
 }
 
 GraphicsSettingsWidget::~GraphicsSettingsWidget() = default;
@@ -915,6 +997,30 @@ void GraphicsSettingsWidget::onAdapterChanged(int index)
 	else
 		dialog()->setStringSettingValue("EmuCore/GS", "Adapter", std::nullopt);
 
+	g_emu_thread->applySettings();
+}
+
+void GraphicsSettingsWidget::onTonemappingChanged()
+{
+	const bool enabled = dialog()->getEffectiveBoolValue("EmuCore/GS", "Tonemapping", false);
+	m_post.tonemappingGamma->setEnabled(enabled);
+	m_post.tonemappingExposure->setEnabled(enabled);
+	m_post.tonemappingSaturation->setEnabled(enabled);
+	m_post.tonemappingBleach->setEnabled(enabled);
+	m_post.tonemappingDefog->setEnabled(enabled);
+	m_post.tonemappingFogColourR->setEnabled(enabled);
+	m_post.tonemappingFogColourG->setEnabled(enabled);
+	m_post.tonemappingFogColourB->setEnabled(enabled);
+	g_emu_thread->applySettings();
+}
+
+void GraphicsSettingsWidget::onVibranceChanged()
+{
+	const bool enabled = dialog()->getEffectiveBoolValue("EmuCore/GS", "Vibrance", false);
+	m_post.vibranceStrength->setEnabled(enabled);
+	m_post.vibranceRGBBalanceR->setEnabled(enabled);
+	m_post.vibranceRGBBalanceG->setEnabled(enabled);
+	m_post.vibranceRGBBalanceB->setEnabled(enabled);
 	g_emu_thread->applySettings();
 }
 

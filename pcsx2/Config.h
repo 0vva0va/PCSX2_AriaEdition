@@ -760,6 +760,20 @@ struct Pcsx2Config
 		static constexpr float DEFAULT_FAKEHDR_RADIUS1 = 0.793f;
 		static constexpr float DEFAULT_FAKEHDR_RADIUS2 = 0.87f;
 
+		static constexpr float DEFAULT_TONEMAPPING_GAMMA = 1.0f;
+		static constexpr float DEFAULT_TONEMAPPING_EXPOSURE = 0.0f;
+		static constexpr float DEFAULT_TONEMAPPING_SATURATION = 0.0f;
+		static constexpr float DEFAULT_TONEMAPPING_BLEACH = 0.0f;
+		static constexpr float DEFAULT_TONEMAPPING_DEFOG = 0.0f;
+		static constexpr float DEFAULT_TONEMAPPING_FOG_COLOUR_R = 0.0f;
+		static constexpr float DEFAULT_TONEMAPPING_FOG_COLOUR_G = 0.0f;
+		static constexpr float DEFAULT_TONEMAPPING_FOG_COLOUR_B = 1.0f;
+
+		static constexpr float DEFAULT_VIBRANCE_STRENGTH = 0.15f;
+		static constexpr float DEFAULT_VIBRANCERGBBALANCE_R = 1.0f;
+		static constexpr float DEFAULT_VIBRANCERGBBALANCE_G = 1.0f;
+		static constexpr float DEFAULT_VIBRANCERGBBALANCE_B = 1.0f;
+
 		union
 		{
 			u64 bitsets[2];
@@ -834,6 +848,8 @@ struct Pcsx2Config
 					FakeHDR : 1,
 					ShadeBoost : 1,
 					LumaSharpen : 1,
+					Tonemapping : 1,
+					Vibrance : 1,
 					DumpGSData : 1,
 					SaveRT : 1,
 					SaveFrame : 1,
@@ -932,6 +948,20 @@ struct Pcsx2Config
 		float FakeHDR_HDRStrength = DEFAULT_FAKEHDR_HDRPOWER;
 		float FakeHDR_Radius1 = DEFAULT_FAKEHDR_RADIUS1;
 		float FakeHDR_Radius2 = DEFAULT_FAKEHDR_RADIUS2;
+
+		float Tonemapping_Gamma = DEFAULT_TONEMAPPING_GAMMA;
+		float Tonemapping_Exposure = DEFAULT_TONEMAPPING_EXPOSURE;
+		float Tonemapping_Saturation = DEFAULT_TONEMAPPING_SATURATION;
+		float Tonemapping_Bleach = DEFAULT_TONEMAPPING_BLEACH;
+		float Tonemapping_DeFog = DEFAULT_TONEMAPPING_DEFOG;
+		float Tonemapping_FogColourR = DEFAULT_TONEMAPPING_FOG_COLOUR_R;
+		float Tonemapping_FogColourG = DEFAULT_TONEMAPPING_FOG_COLOUR_G;
+		float Tonemapping_FogColourB = DEFAULT_TONEMAPPING_FOG_COLOUR_B;
+
+		float Vibrance_Strength = DEFAULT_VIBRANCE_STRENGTH;
+		float Vibrance_RGBBalanceR = DEFAULT_VIBRANCERGBBALANCE_R;
+		float Vibrance_RGBBalanceG = DEFAULT_VIBRANCERGBBALANCE_G;
+		float Vibrance_RGBBalanceB = DEFAULT_VIBRANCERGBBALANCE_B;
 
 		u8 PNGCompressionLevel = 1;
 

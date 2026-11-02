@@ -1511,6 +1511,8 @@ protected:
 	virtual void DoSMAA(GSTexture* sTex, GSTexture* dTex) = 0;
 	virtual void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
 	virtual void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
+	virtual void DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4]) = 0;
+	virtual void DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
 	virtual void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) = 0;
 
 	/// Resolves CAS shader includes for the specified source.
@@ -1724,6 +1726,8 @@ public:
 	void SMAA();
 	void ShadeBoost();
 	void LumaSharpen();
+	void Tonemapping();
+	void Vibrance();
 	void FakeHDR();
 	void Resize(int width, int height);
 

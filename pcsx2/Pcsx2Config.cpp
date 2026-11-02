@@ -877,6 +877,18 @@ bool Pcsx2Config::GSOptions::OptionsAreEqual(const GSOptions& right) const
 		OpEqu(LumaSharpen_SharpClamp) &&
 		OpEqu(LumaSharpen_Pattern) &&
 		OpEqu(LumaSharpen_Offset) &&
+		OpEqu(Tonemapping_Gamma) &&
+		OpEqu(Tonemapping_Exposure) &&
+		OpEqu(Tonemapping_Saturation) &&
+		OpEqu(Tonemapping_Bleach) &&
+		OpEqu(Tonemapping_DeFog) &&
+		OpEqu(Tonemapping_FogColourR) &&
+		OpEqu(Tonemapping_FogColourG) &&
+		OpEqu(Tonemapping_FogColourB) &&
+		OpEqu(Vibrance_Strength) &&
+		OpEqu(Vibrance_RGBBalanceR) &&
+		OpEqu(Vibrance_RGBBalanceG) &&
+		OpEqu(Vibrance_RGBBalanceB) &&
 		OpEqu(PNGCompressionLevel) &&
 		OpEqu(SaveDrawStart) &&
 		OpEqu(SaveDrawCount) &&
@@ -1020,6 +1032,8 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapBitBool(FakeHDR);
 	SettingsWrapBitBool(ShadeBoost);
 	SettingsWrapBitBool(LumaSharpen);
+	SettingsWrapBitBool(Tonemapping);
+	SettingsWrapBitBool(Vibrance);
 	SettingsWrapBitBoolEx(DumpGSData, "DumpGSData");
 	SettingsWrapBitBoolEx(SaveRT, "SaveRT");
 	SettingsWrapBitBoolEx(SaveFrame, "SaveFrame");
@@ -1105,6 +1119,18 @@ void Pcsx2Config::GSOptions::LoadSave(SettingsWrapper& wrap)
 	SettingsWrapEntry(LumaSharpen_SharpClamp);
 	SettingsWrapEntry(LumaSharpen_Pattern);
 	SettingsWrapEntry(LumaSharpen_Offset);
+	SettingsWrapEntry(Tonemapping_Gamma);
+	SettingsWrapEntry(Tonemapping_Exposure);
+	SettingsWrapEntry(Tonemapping_Saturation);
+	SettingsWrapEntry(Tonemapping_Bleach);
+	SettingsWrapEntry(Tonemapping_DeFog);
+	SettingsWrapEntry(Tonemapping_FogColourR);
+	SettingsWrapEntry(Tonemapping_FogColourG);
+	SettingsWrapEntry(Tonemapping_FogColourB);
+	SettingsWrapEntry(Vibrance_Strength);
+	SettingsWrapEntry(Vibrance_RGBBalanceR);
+	SettingsWrapEntry(Vibrance_RGBBalanceG);
+	SettingsWrapEntry(Vibrance_RGBBalanceB);
 	SettingsWrapBitfield(ExclusiveFullscreenControl);
 	SettingsWrapBitfieldEx(PNGCompressionLevel, "png_compression_level");
 	SettingsWrapBitfieldEx(SaveDrawStart, "SaveDrawStart");

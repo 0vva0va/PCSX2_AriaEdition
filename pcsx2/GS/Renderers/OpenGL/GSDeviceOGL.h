@@ -245,6 +245,16 @@ private:
 
 	struct
 	{
+		GLProgram ps;
+	} m_tonemapping;
+
+	struct
+	{
+		GLProgram ps;
+	} m_vibrance;
+
+	struct
+	{
 		GLProgram upscale_ps;
 		GLProgram sharpen_ps;
 	} m_cas;
@@ -320,6 +330,12 @@ private:
 
 	bool CompileFakeHDRProgram();
 	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
+
+	bool CompileTonemappingProgram();
+	void DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4]) override;
+
+	bool CompileVibranceProgram();
+	void DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4]) override;
 
 	bool CreateCASPrograms();
 	bool DoCAS(GSTexture* sTex, GSTexture* dTex, bool sharpen_only, const std::array<u32, NUM_CAS_CONSTANTS>& constants) override;

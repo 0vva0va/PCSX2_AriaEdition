@@ -252,11 +252,17 @@ bool GSRenderer::Merge(int field)
 	if (GSConfig.FakeHDR)
 		g_gs_device->FakeHDR();
 
-	if (GSConfig.FXAA)
-		g_gs_device->FXAA();
+	if (GSConfig.Tonemapping)
+		g_gs_device->Tonemapping();
 
-	if (GSConfig.SMAA)
-		g_gs_device->SMAA();
+	if (GSConfig.Vibrance)
+		g_gs_device->Vibrance();
+
+	//if (GSConfig.FXAA)
+	//	g_gs_device->FXAA();
+
+	//if (GSConfig.SMAA)
+	//	g_gs_device->SMAA();
 
 	
 

@@ -1079,15 +1079,57 @@ void GSDevice::FakeHDR()
 {
 	if (ResizeRenderTarget(&m_target_tmp, m_current->GetWidth(), m_current->GetHeight(), false, false))
 	{
-
-		// Use FakeHDR-specific settings (was incorrectly using ShadeBoost settings)
 		const GSVector4 params(
 			static_cast<float>(GSConfig.FakeHDR_HDRStrength),
 			static_cast<float>(GSConfig.FakeHDR_Radius1),
 			static_cast<float>(GSConfig.FakeHDR_Radius2),
-			static_cast<float>(1.0f));
+			static_cast<float>(1.0f)
+		);
 
 		DoFakeHDR(m_current, m_target_tmp, params.v);
+
+		m_current = m_target_tmp;
+	}
+}
+
+void GSDevice::Tonemapping()
+{
+	if (ResizeRenderTarget(&m_target_tmp, m_current->GetWidth(), m_current->GetHeight(), false, false))
+	{
+		const GSVector4 params(
+			static_cast<float>(GSConfig.Tonemapping_Gamma),
+			static_cast<float>(GSConfig.Tonemapping_Exposure),
+			static_cast<float>(GSConfig.Tonemapping_Saturation),
+			static_cast<float>(1.0f));
+
+		const GSVector2 params2(
+			static_cast<float>(GSConfig.Tonemapping_Bleach),
+			static_cast<float>(GSConfig.Tonemapping_DeFog));
+
+		const GSVector4 fogColour(
+			static_cast<float>(GSConfig.Tonemapping_FogColourR),
+			static_cast<float>(GSConfig.Tonemapping_FogColourG),
+			static_cast<float>(GSConfig.Tonemapping_FogColourB),
+			static_cast<float>(1.0f));
+
+		DoTonemapping(m_current, m_target_tmp, params.v, params2.v, fogColour.v);
+
+		m_current = m_target_tmp;
+	}
+}
+
+void GSDevice::Vibrance()
+{
+	if (ResizeRenderTarget(&m_target_tmp, m_current->GetWidth(), m_current->GetHeight(), false, false))
+	{
+		const GSVector4 params(
+			static_cast<float>(GSConfig.Vibrance_Strength),
+			static_cast<float>(GSConfig.Vibrance_RGBBalanceR),
+			static_cast<float>(GSConfig.Vibrance_RGBBalanceG),
+			static_cast<float>(GSConfig.Vibrance_RGBBalanceB)
+		);
+
+		DoVibrance(m_current, m_target_tmp, params.v);
 
 		m_current = m_target_tmp;
 	}

@@ -415,6 +415,8 @@ private:
 	ComPtr<ID3D12PipelineState> m_shadeboost_pipeline;
 	ComPtr<ID3D12PipelineState> m_lumasharpen_pipeline;
 	ComPtr<ID3D12PipelineState> m_fakehdr_pipeline;
+	ComPtr<ID3D12PipelineState> m_tonemapping_pipeline;
+	ComPtr<ID3D12PipelineState> m_vibrance_pipeline;
 	ComPtr<ID3D12PipelineState> m_imgui_pipeline;
 
 	ID3D12PipelineState* GetConvertPipeline(ShaderConvertSelector shader) const
@@ -460,6 +462,8 @@ private:
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
+	void DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4]) final;
+	void DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
 	void DoSMAA(GSTexture* sTex, GSTexture* dTex) final;
 	bool DoCAS(GSTexture* sTex, GSTexture* dTex, bool sharpen_only, const std::array<u32, NUM_CAS_CONSTANTS>& constants) final;

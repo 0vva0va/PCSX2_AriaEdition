@@ -3572,6 +3572,44 @@ void GSDeviceVK::DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[
 	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
 }
 
+void GSDeviceVK::DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4])
+{
+	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
+	const GSVector4i dRect = dTex->GetRect();
+
+	EndRenderPass();
+	OMSetRenderTargets(dTex, nullptr, dRect);
+	SetUtilityTexture(sTex, m_point_sampler);
+	BeginRenderPass(m_utility_color_render_pass_discard, dRect);
+	dTex->SetState(GSTexture::State::Dirty);
+	SetPipeline(m_tonemapping_pipeline);
+	SetUtilityPushConstants(params, sizeof(float) * 4);
+	SetUtilityPushConstants(params2, sizeof(float) * 2);
+	SetUtilityPushConstants(fogColour, sizeof(float) * 4);
+	DrawStretchRect(sRect, GSVector4(dRect), dTex->GetSize());
+	EndRenderPass();
+
+	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
+}
+
+void GSDeviceVK::DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4])
+{
+	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
+	const GSVector4i dRect = dTex->GetRect();
+
+	EndRenderPass();
+	OMSetRenderTargets(dTex, nullptr, dRect);
+	SetUtilityTexture(sTex, m_point_sampler);
+	BeginRenderPass(m_utility_color_render_pass_discard, dRect);
+	dTex->SetState(GSTexture::State::Dirty);
+	SetPipeline(m_vibrance_pipeline);
+	SetUtilityPushConstants(params, sizeof(float) * 4);
+	DrawStretchRect(sRect, GSVector4(dRect), dTex->GetSize());
+	EndRenderPass();
+
+	static_cast<GSTextureVK*>(dTex)->TransitionToLayout(GSTextureVK::Layout::ShaderReadOnly);
+}
+
 void GSDeviceVK::DoFXAA(GSTexture* sTex, GSTexture* dTex)
 {
 	const GSVector4 sRect = GSVector4(0.0f, 0.0f, 1.0f, 1.0f);
@@ -4601,6 +4639,7 @@ bool GSDeviceVK::CompilePostProcessingPipelines()
 		Vulkan::SetObjectName(m_device, m_shadeboost_pipeline, "Shadeboost pipeline");
 	}
 
+	// Luma Sharpen Pipeline
 	{
 		const std::optional<std::string> shader = ReadShaderSource("shaders/vulkan/lumasharpen.glsl");
 		if (!shader)
@@ -4629,6 +4668,7 @@ bool GSDeviceVK::CompilePostProcessingPipelines()
 		Vulkan::SetObjectName(m_device, m_lumasharpen_pipeline, "LumaSharpen pipeline");
 	}
 
+	// Fake HDR Pipeline
 	{
 		const std::optional<std::string> shader = ReadShaderSource("shaders/vulkan/fakehdr.glsl");
 		if (!shader)
@@ -4655,6 +4695,64 @@ bool GSDeviceVK::CompilePostProcessingPipelines()
 			return false;
 
 		Vulkan::SetObjectName(m_device, m_fakehdr_pipeline, "FakeHDR pipeline");
+	}
+
+	// Tonemapping Pipeline
+	{
+		const std::optional<std::string> shader = ReadShaderSource("shaders/vulkan/tonemap.glsl");
+		if (!shader)
+		{
+			Host::ReportErrorAsync("GS", "Failed to read shaders/vulkan/tonemap.glsl.");
+			return false;
+		}
+
+		VkShaderModule vs = GetUtilityVertexShader(*shader);
+		ScopedGuard vs_guard([this, &vs]() { vkDestroyShaderModule(m_device, vs, nullptr); });
+		if (vs == VK_NULL_HANDLE)
+			return false;
+
+		VkShaderModule ps = GetUtilityFragmentShader(*shader);
+		ScopedGuard ps_guard([this, &ps]() { vkDestroyShaderModule(m_device, ps, nullptr); });
+		if (ps == VK_NULL_HANDLE)
+			return false;
+
+		gpb.SetVertexShader(vs);
+		gpb.SetFragmentShader(ps);
+
+		m_tonemapping_pipeline = gpb.Create(m_device, g_vulkan_shader_cache->GetPipelineCache(true), false);
+		if (!m_tonemapping_pipeline)
+			return false;
+
+		Vulkan::SetObjectName(m_device, m_tonemapping_pipeline, "Tonemapping pipeline");
+	}
+
+	// Vibrance Pipeline
+	{
+		const std::optional<std::string> shader = ReadShaderSource("shaders/vulkan/vibrance.glsl");
+		if (!shader)
+		{
+			Host::ReportErrorAsync("GS", "Failed to read shaders/vulkan/vibrance.glsl.");
+			return false;
+		}
+
+		VkShaderModule vs = GetUtilityVertexShader(*shader);
+		ScopedGuard vs_guard([this, &vs]() { vkDestroyShaderModule(m_device, vs, nullptr); });
+		if (vs == VK_NULL_HANDLE)
+			return false;
+
+		VkShaderModule ps = GetUtilityFragmentShader(*shader);
+		ScopedGuard ps_guard([this, &ps]() { vkDestroyShaderModule(m_device, ps, nullptr); });
+		if (ps == VK_NULL_HANDLE)
+			return false;
+
+		gpb.SetVertexShader(vs);
+		gpb.SetFragmentShader(ps);
+
+		m_tonemapping_pipeline = gpb.Create(m_device, g_vulkan_shader_cache->GetPipelineCache(true), false);
+		if (!m_vibrance_pipeline)
+			return false;
+
+		Vulkan::SetObjectName(m_device, m_vibrance_pipeline, "Vibrance pipeline");
 	}
 
 	return true;
@@ -4951,6 +5049,10 @@ void GSDeviceVK::DestroyResources()
 		vkDestroyPipeline(m_device, m_lumasharpen_pipeline, nullptr);
 	if (m_fakehdr_pipeline != VK_NULL_HANDLE)
 		vkDestroyPipeline(m_device, m_fakehdr_pipeline, nullptr);
+	if (m_tonemapping_pipeline != VK_NULL_HANDLE)
+		vkDestroyPipeline(m_device, m_tonemapping_pipeline, nullptr);
+	if (m_vibrance_pipeline != VK_NULL_HANDLE)
+		vkDestroyPipeline(m_device, m_vibrance_pipeline, nullptr);
 
 	for (VkPipeline it : m_cas_pipelines)
 	{

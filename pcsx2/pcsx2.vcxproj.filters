@@ -363,6 +363,12 @@
     <None Include="..\bin\resources\shaders\opengl\fakehdr.glsl">
       <Filter>System\Ps2\GS\Shaders\OpenGL</Filter>
     </None>
+    <None Include="..\bin\resources\shaders\opengl\tonemap.glsl">
+      <Filter>System\Ps2\GS\Shaders\OpenGL</Filter>
+    </None>
+    <None Include="..\bin\resources\shaders\opengl\vibrance.glsl">
+      <Filter>System\Ps2\GS\Shaders\OpenGL</Filter>
+    </None>
     <None Include="..\bin\resources\shaders\opengl\imgui.glsl">
       <Filter>System\Ps2\GS\Shaders\OpenGL</Filter>
     </None>
@@ -396,6 +402,12 @@
     <None Include="..\bin\resources\shaders\vulkan\fakehdr.glsl">
       <Filter>System\Ps2\GS\Shaders\Vulkan</Filter>
     </None>
+    <None Include="..\bin\resources\shaders\vulkan\tonemap.glsl">
+      <Filter>System\Ps2\GS\Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\bin\resources\shaders\vulkan\vibrance.glsl">
+      <Filter>System\Ps2\GS\Shaders\Vulkan</Filter>
+    </None>
     <None Include="..\bin\resources\shaders\dx11\tfx.fx">
       <Filter>System\Ps2\GS\Shaders\Direct3D</Filter>
     </None>
@@ -406,6 +418,12 @@
       <Filter>System\Ps2\GS\Shaders\Direct3D</Filter>
     </None>
     <None Include="..\bin\resources\shaders\dx11\fakehdr.fx">
+      <Filter>System\Ps2\GS\Shaders\Direct3D</Filter>
+    </None>
+    <None Include="..\bin\resources\shaders\dx11\tonemap.fx">
+      <Filter>System\Ps2\GS\Shaders\Direct3D</Filter>
+    </None>
+    <None Include="..\bin\resources\shaders\dx11\vibrance.fx">
       <Filter>System\Ps2\GS\Shaders\Direct3D</Filter>
     </None>
     <None Include="..\bin\resources\shaders\dx11\merge.fx">

@@ -449,6 +449,8 @@ private:
 	VkPipeline m_shadeboost_pipeline = {};
 	VkPipeline m_lumasharpen_pipeline = {};
 	VkPipeline m_fakehdr_pipeline = {};
+	VkPipeline m_tonemapping_pipeline = {};
+	VkPipeline m_vibrance_pipeline = {};
 
 	VkPipeline GetConvertPipeline(ShaderConvertSelector shader) const
 	{
@@ -496,6 +498,8 @@ private:
 	void DoShadeBoost(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoLumaSharpen(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoFakeHDR(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
+	void DoTonemapping(GSTexture* sTex, GSTexture* dTex, const float params[4], const float params2[2], const float fogColour[4]) final;
+	void DoVibrance(GSTexture* sTex, GSTexture* dTex, const float params[4]) final;
 	void DoFXAA(GSTexture* sTex, GSTexture* dTex) final;
 	void DoSMAA(GSTexture* sTex, GSTexture* dTex) final;
 
